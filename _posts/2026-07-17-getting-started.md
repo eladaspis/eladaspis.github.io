@@ -6,8 +6,6 @@ math: true
 tags: [research, multi-agent]
 ---
 
-# Getting Started with My PhD Research
-
 I'm excited to share that I've started my PhD at Ben Gurion University of the Negev, working under the supervision of Dr. Eliya Nachmani. My research focuses on **multi-agent turn-taking** — how multiple AI agents can coordinate and communicate effectively in conversation.
 
 ## Why Multi-Agent Turn-Taking?
