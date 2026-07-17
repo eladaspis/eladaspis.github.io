@@ -1,1 +1,5 @@
-[]
+- id: getting-started
+  title: "Getting Started with My PhD Research"
+  date: "July 2026"
+  description: "An introduction to my research on multi-agent turn-taking at BGU."
+  url: "/blog/2026/07/17/getting-started/"
