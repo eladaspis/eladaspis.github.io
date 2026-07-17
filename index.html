@@ -1,0 +1,70 @@
+---
+layout: default
+title: Elad Aspis
+---
+
+<!-- Hero Section -->
+<section class="py-12 md:py-16 bg-surface">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="flex flex-col items-center text-center md:text-left md:flex-row md:items-start gap-8">
+      <!-- Portrait -->
+      <div class="flex-shrink-0">
+        <img src="{{ '/images/portrait.jpg' | relative_url }}"
+             alt="{{ site.name }}"
+             class="w-48 h-48 md:w-56 md:h-56 object-cover">
+      </div>
+
+      <!-- Bio -->
+      <div class="flex-1">
+        <h1 class="font-display text-3xl md:text-4xl font-semibold text-text">
+          Hello, I'm {{ site.name }}
+        </h1>
+        <div class="text-text-body mt-4 max-w-prose leading-relaxed prose">
+          {{ site.description | markdownify }}
+        </div>
+
+        <!-- Links -->
+        <div class="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
+          <a href="{{ '/cv/' | relative_url }}" class="inline-flex items-center text-text-muted hover:text-text font-sans text-sm no-underline">
+            {% include icons/file.html class="w-4 h-4 mr-1.5" %}
+            CV
+          </a>
+
+          <a href="https://github.com/{{ site.github_username }}" class="inline-flex items-center text-text-muted hover:text-text font-sans text-sm no-underline">
+            {% include icons/github.html class="w-4 h-4 mr-1.5" %}
+            GitHub
+          </a>
+
+          <a href="https://linkedin.com/in/{{ site.linkedin_username }}" class="inline-flex items-center text-text-muted hover:text-text font-sans text-sm no-underline">
+            {% include icons/linkedin.html class="w-4 h-4 mr-1.5" %}
+            LinkedIn
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Highlights Section -->
+<section class="relative py-12 md:py-16">
+  <!-- Background with faded edges -->
+  <div class="absolute inset-0 bg-surface-muted" style="mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);"></div>
+  <div class="relative max-w-4xl mx-auto px-6">
+    <h2 class="font-display text-2xl font-semibold text-text mb-8">Highlights</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for highlight in site.data.highlights %}
+        {% include highlight.html h=highlight %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Publications Section -->
+<section class="py-12 md:py-16 bg-surface">
+  <div class="max-w-4xl mx-auto px-6">
+    <h2 class="font-display text-2xl font-semibold text-text mb-8">Publications</h2>
+    {% for pub in site.data.publications %}
+      {% include publication.html pub=pub %}
+    {% endfor %}
+  </div>
+</section>

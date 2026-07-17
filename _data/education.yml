@@ -1,0 +1,19 @@
+- name: Ben Gurion University of the Negev
+  description: >-
+    Ph.D. candidate in Electrical and Computer Engineering, advised by
+    <a href="https://elidan.github.io/">Asst. Prof. Eliya Nachmani</a>.
+    Research on multi-agent turn-taking.
+  dates: "2026 – Present"
+
+- name: Bar Ilan University
+  description: >-
+    M.Sc. in Electrical Engineering, advised by
+    <a href="https://uarielbiu.wixsite.com/sharon-gannot">Prof. Sharon Gannot</a>.
+    Research on audio enhancement using diffusion models conditioned on MIDI representations.
+  dates: "2023 – 2026"
+
+- name: Technion – Israel Institute of Technology
+  description: >-
+    B.Sc. in Computer Science and Mathematics.
+    Dean's List 2020, 2022.
+  dates: "2018 – 2022"
