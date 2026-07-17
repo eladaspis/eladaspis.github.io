@@ -26,7 +26,7 @@ description: |
   I am a PhD candidate at [Ben Gurion University of the Negev](https://www.bgu.ac.il/) where I research multi-agent turn-taking under the supervision of [Dr. Eliya Nachmani](https://elidan.github.io/).
   My work sits at the intersection of generative AI, diffusion models, and deep learning, with a focus on audio and language applications.
 
-  Previously I was a Senior AI Engineer at [General Motors](https://www.gm.com/) CyberSecurity Group, where I developed deep learning models for audio-based event detection and integrated LLMs to build autonomous AI agents.
+  Previously I was a Senior AI Engineer at [General Motors](https://www.gm.com/) Cyber Security Group, where I developed deep learning models for audio-based event detection and integrated LLMs to build autonomous AI agents.
   I received my M.Sc. from [Bar Ilan University](https://www.biu.ac.il/) in 2026, advised by [Prof. Sharon Gannot](https://uarielbiu.wixsite.com/sharon-gannot), and my B.Sc. from the [Technion](https://www.technion.ac.il/) in 2022.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://eladaspis.github.io" # the base hostname & protocol for your site, e.g. http://example.com

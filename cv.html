@@ -71,33 +71,3 @@ title: CV - Elad Aspis
   {% endfor %}
 </section>
 
-<!-- Publications -->
-<section class="mt-8">
-  <h2 class="font-display text-2xl font-semibold text-text mb-4">Publications</h2>
-  {% for publication in site.data.publications %}
-  <div class="flex flex-col md:flex-row md:justify-between gap-1 mb-4">
-    <div class="flex-1">
-      <p>
-        <a href="{{ publication.project_page }}" class="font-semibold hover:text-text-body">{{ publication.title }}</a>
-      </p>
-      <p class="text-text-body text-sm">
-        {% for author_id in publication.authors %}
-          {% assign author = site.data.authors[author_id] %}
-          {% if author.is_me %}
-            <span class="font-semibold">{{ author.first_name | slice: 0 }}. {{ author.last_name }}</span>{% unless forloop.last %}, {% endunless %}
-          {% else %}
-            <a href="{{ author.website }}" class="hover:text-text">{{ author.first_name | slice: 0 }}. {{ author.last_name }}</a>{% unless forloop.last %}, {% endunless %}
-          {% endif %}
-        {% endfor %}
-        {% if publication.with_collaborators %}
-          with collaborators at <a href="{{ publication.with_collaborators.url }}" class="hover:text-text">{{ publication.with_collaborators.name }}</a>
-        {% endif %}
-      </p>
-      <p class="text-text-muted text-sm">{{ publication.description }}</p>
-    </div>
-    <div class="text-text-muted text-sm md:text-right flex-shrink-0">
-      {{ publication.venue }}
-    </div>
-  </div>
-  {% endfor %}
-</section>
