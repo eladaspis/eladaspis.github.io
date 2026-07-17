@@ -20,16 +20,6 @@ $$
 
 where $a_t$ represents the agent acting at time $t$ and $\text{context}_t$ captures the full conversation history.
 
-## Connection to Diffusion Models
-
-During my MSc at Bar Ilan, I worked on diffusion models for audio enhancement. Diffusion models provide a powerful framework for modeling complex distributions, which is directly relevant to generating natural turn-taking behavior:
-
-$$
-x_{t-1} = \mu_\theta(x_t, t) + \sigma_t \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
-$$
-
-I'm exploring how these generative approaches can inform multi-agent coordination.
-
 ## What's Next
 
 I'll be sharing updates about my research progress, paper reviews, and interesting findings along the way. Stay tuned!
