@@ -43,75 +43,10 @@ Back in 2017, most neural audio work used **continuous** latent representations.
 
 The **Vector Quantized Variational Autoencoder** (VQ-VAE) by van den Oord et al. at DeepMind proposed a radical alternative: what if we force the latent space to be **discrete**? Instead of encoding audio into a continuous vector $z$, we encode it into a sequence of **indices** from a learned codebook — like a vocabulary of audio tokens. This small change unlocked massive improvements in both compression and generation quality.
 
-Here's the core idea at a glance:
 ### Architecture
 
-<div class="my-8 flex justify-center">
-  <svg width="100%" max-width="800px" height="220" viewBox="0 0 800 220" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full">
-    <defs>
-      <linearGradient id="encoderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#4F46E5" />
-        <stop offset="100%" stop-color="#7C3AED" />
-      </linearGradient>
-      <linearGradient id="codebookGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#EC4899" />
-        <stop offset="100%" stop-color="#F43F5E" />
-      </linearGradient>
-      <linearGradient id="decoderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#10B981" />
-        <stop offset="100%" stop-color="#059669" />
-      </linearGradient>
-      <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%" filterUnits="userSpaceOnUse">
-        <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.1" />
-      </filter>
-    </defs>
-
-    <rect width="800" height="220" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
-
-    <text x="20" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#64748B" font-weight="600">Waveform x</text>
-    <path d="M 100 120 L 130 120" stroke="#94A3B8" stroke-width="2" />
-    <polygon points="130,120 122,115 122,125" fill="#94A3B8" />
-
-    <g filter="url(#shadow)">
-      <rect x="130" y="65" width="140" height="90" rx="8" fill="url(#encoderGrad)" />
-      <text x="200" y="105" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="white" font-weight="bold" text-anchor="middle">Encoder</text>
-      <text x="200" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#E9D5FF" text-anchor="middle">E_φ(x) → z_e</text>
-    </g>
-
-    <path d="M 270 110 L 350 110" stroke="#94A3B8" stroke-width="2" />
-    <polygon points="350,110 342,105 342,115" fill="#94A3B8" />
-    <text x="310" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569" font-weight="600" text-anchor="middle">z_e (continuous)</text>
-
-    <g filter="url(#shadow)">
-      <rect x="350" y="65" width="160" height="90" rx="8" fill="url(#codebookGrad)" />
-      <text x="430" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="white" font-weight="bold" text-anchor="middle">Vector Quantization</text>
-      <text x="430" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#FCE7F3" text-anchor="middle">z_q = argmin ‖z_e - e‖</text>
-      <text x="430" y="138" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#FCE7F3" text-anchor="middle">Codebook {e₁…e_K}</text>
-    </g>
-
-    <path d="M 510 110 L 590 110" stroke="#94A3B8" stroke-width="2" />
-    <polygon points="590,110 582,105 582,115" fill="#94A3B8" />
-    <text x="550" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569" font-weight="600" text-anchor="middle">z_q (discrete)</text>
-
-    <g filter="url(#shadow)">
-      <rect x="590" y="65" width="140" height="90" rx="8" fill="url(#decoderGrad)" />
-      <text x="660" y="105" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="white" font-weight="bold" text-anchor="middle">Decoder</text>
-      <text x="660" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#D1FAE5" text-anchor="middle">D_θ(z_q) → x̂</text>
-    </g>
-
-    <path d="M 730 110 L 770 110" stroke="#94A3B8" stroke-width="2" />
-    <polygon points="770,110 762,105 762,115" fill="#94A3B8" />
-    <text x="785" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#64748B" font-weight="600">x̂</text>
-
-    <!-- Straight-Through Estimator annotation -->
-    <path d="M 660 155 L 200 155" stroke="#F59E0B" stroke-width="2" stroke-dasharray="6 3" />
-    <polygon points="200,155 210,150 210,160" fill="#F59E0B" />
-    <text x="430" y="185" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#D97706" font-weight="bold" text-anchor="middle">Straight-Through: ∂L/∂z_e ≈ ∂L/∂z_q  (gradients skip quantization)</text>
-  </svg>
-</div>
-
 <figure style="text-align: center; margin: 2rem 0;">
-  <img src="/images/vqvae_fig1_paper.png" alt="Original VQ-VAE Figure 1 from van den Oord et al. (2017)" style="max-width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+  <img src="/images/vqvae_fig1_paper.png" alt="Original VQ-VAE Figure 1 from van den Oord et al. (2017)" style="max-width: 600px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
   <figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;"><strong>Figure 1 from the original VQ-VAE paper</strong> (van den Oord et al., 2017). <strong>Left:</strong> The VQ-VAE architecture — input $x$ is encoded to $z_e(x)$, quantized to the nearest codebook entry $e_2$, and decoded to $\hat{x}$. <strong>Right:</strong> Visualization of the embedding space — the gradient $\nabla_z L$ (red arrow) pushes the encoder output toward $e_2$, enabling the straight-through gradient flow.</figcaption>
 </figure>
 
