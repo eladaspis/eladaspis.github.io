@@ -157,6 +157,16 @@ The key line is `z_e + (z_q - z_e).detach()`:
 
 This means the decoder receives discrete $z_q$ tokens, but the encoder is updated as if it produced $z_q$ continuously — the best of both worlds.
 
+### Why Is It Called a VAE?
+
+Despite the name, VQ-VAE differs from a standard VAE in key ways:
+
+- **No KL divergence**: The posterior $q(z|x)$ is deterministic (argmin), and the prior is assumed uniform, so the KL term is constant and ignored during training.
+- **No reparameterization trick**: Instead of sampling from a parametric distribution, VQ-VAE uses nearest-neighbor lookup. Gradients are copied through the straight-through estimator rather than backpropagated through a stochastic sample.
+- **Discrete latent space**: Standard VAEs use continuous Gaussians; VQ-VAE uses a categorical distribution over codebook entries.
+
+So why the "VAE" name? Because the architecture fits the VAE framework structurally: an encoder produces a posterior $q(z|x)$, a prior $p(z)$ is defined over the latent space, and a decoder models $p(x|z)$. The ELBO still holds — it just reduces to reconstruction loss when the prior is uniform and the posterior is deterministic. VQ-VAE is a VAE where the **reparameterization is replaced by quantization + straight-through estimation**.
+
 ### Why This Matters
 
 VQ-VAE's discrete latents were a breakthrough, but they had a limitation: the single codebook operates at one granularity. Low-level details (like phonemes) and high-level structure (like prosody) get conflated in the same latent space. The next iteration tackled this head-on.
