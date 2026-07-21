@@ -142,72 +142,18 @@ $$\frac{\partial \mathcal{L}}{\partial z_e} \approx \frac{\partial \mathcal{L}}{
 
 This "straight-through" estimator enables end-to-end training despite discrete latents.
 
-Below is a visual comparison of the gradient flow with and without the straight-through estimator:
+Below are the actual PyTorch computation graphs generated with `torchview`, comparing the gradient flow with and without the straight-through estimator:
 
-<figure style="text-align: center; margin: 2rem 0;">
-<svg width="100%" max-width="800px" height="500" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;" class="w-full">
-  <rect width="800" height="500" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
-  <text x="200" y="35" font-size="15" font-weight="bold" fill="#1E293B" text-anchor="middle">With Straight-Through (✓)</text>
-  <text x="200" y="55" font-size="12" fill="#64748B" text-anchor="middle">z_q = z_e + (z_q − z_e).detach()</text>
-  <rect x="100" y="100" width="140" height="70" rx="8" fill="#4F46E5" />
-  <text x="170" y="135" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Encoder</text>
-  <text x="170" y="152" font-size="11" fill="#E9D5FF" text-anchor="middle">E_φ(x)</text>
-  <rect x="100" y="200" width="140" height="70" rx="8" fill="#EC4899" />
-  <text x="170" y="235" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Quantization</text>
-  <text x="170" y="252" font-size="10" fill="#FCE7F3" text-anchor="middle">argmin + Codebook</text>
-  <rect x="100" y="300" width="140" height="70" rx="8" fill="#10B981" />
-  <text x="170" y="335" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Decoder</text>
-  <text x="170" y="352" font-size="11" fill="#D1FAE5" text-anchor="middle">D_θ(z_q)</text>
-  <rect x="100" y="400" width="140" height="40" rx="6" fill="#EF4444" />
-  <text x="170" y="423" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Loss: L(x, x̂)</text>
-  <path d="M 170 170 L 170 190" stroke="#94A3B8" stroke-width="2" />
-  <polygon points="170,190 165,182 175,182" fill="#94A3B8" />
-  <path d="M 170 270 L 170 290" stroke="#94A3B8" stroke-width="2" />
-  <polygon points="170,290 165,282 175,282" fill="#94A3B8" />
-  <path d="M 170 370 L 170 390" stroke="#94A3B8" stroke-width="2" />
-  <polygon points="170,390 165,382 175,382" fill="#94A3B8" />
-  <path d="M 270 335 L 270 325 Q 280 260 270 235 L 270 135" stroke="#10B981" stroke-width="3" stroke-dasharray="8 4" fill="none" />
-  <polygon points="270,135 263,147 277,147" fill="#10B981" />
-  <path d="M 240 430 L 310 430 L 310 335" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 4" fill="none" />
-  <polygon points="310,335 305,343 315,343" fill="#EF4444" />
-  <text x="310" y="195" font-size="11" fill="#10B981" font-weight="bold">Backward: gradient</text>
-  <text x="310" y="210" font-size="11" fill="#10B981" font-weight="bold">bypasses quantization!</text>
-  <text x="310" y="225" font-size="11" fill="#64748B">∂L/∂z_e ≈ ∂L/∂z_q</text>
-  <line x1="400" y1="20" x2="400" y2="480" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 4" />
-  <text x="600" y="35" font-size="15" font-weight="bold" fill="#1E293B" text-anchor="middle">Without Straight-Through (✗)</text>
-  <text x="600" y="55" font-size="12" fill="#64748B" text-anchor="middle">z_q = codebook(argmin(distances))</text>
-  <rect x="500" y="100" width="140" height="70" rx="8" fill="#4F46E5" opacity="0.6" />
-  <text x="570" y="135" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Encoder</text>
-  <text x="570" y="152" font-size="11" fill="#E9D5FF" text-anchor="middle">E_φ(x)</text>
-  <rect x="500" y="200" width="140" height="70" rx="8" fill="#EC4899" opacity="0.6" />
-  <text x="570" y="235" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Quantization</text>
-  <text x="570" y="252" font-size="10" fill="#FCE7F3" text-anchor="middle">argmin + Codebook</text>
-  <line x1="510" y1="210" x2="630" y2="260" stroke="#EF4444" stroke-width="4" />
-  <line x1="630" y1="210" x2="510" y2="260" stroke="#EF4444" stroke-width="4" />
-  <rect x="500" y="300" width="140" height="70" rx="8" fill="#10B981" opacity="0.6" />
-  <text x="570" y="335" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Decoder</text>
-  <text x="570" y="352" font-size="11" fill="#D1FAE5" text-anchor="middle">D_θ(z_q)</text>
-  <rect x="500" y="400" width="140" height="40" rx="6" fill="#EF4444" opacity="0.6" />
-  <text x="570" y="423" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Loss: L(x, x̂)</text>
-  <path d="M 570 170 L 570 190" stroke="#94A3B8" stroke-width="2" opacity="0.6" />
-  <polygon points="570,190 565,182 575,182" fill="#94A3B8" opacity="0.6" />
-  <path d="M 570 270 L 570 290" stroke="#94A3B8" stroke-width="2" opacity="0.6" />
-  <polygon points="570,290 565,282 575,282" fill="#94A3B8" opacity="0.6" />
-  <path d="M 570 370 L 570 390" stroke="#94A3B8" stroke-width="2" opacity="0.6" />
-  <polygon points="570,390 565,382 575,382" fill="#94A3B8" opacity="0.6" />
-  <path d="M 640 430 L 710 430 L 710 335" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 4" opacity="0.5" />
-  <polygon points="710,335 705,343 715,343" fill="#EF4444" opacity="0.5" />
-  <path d="M 710 300 L 710 260" stroke="#EF4444" stroke-width="3" stroke-dasharray="8 4" opacity="0.7" />
-  <rect x="695" y="260" width="30" height="20" rx="3" fill="#EF4444" />
-  <text x="710" y="274" font-size="11" font-weight="bold" fill="white" text-anchor="middle">✗</text>
-  <text x="720" y="195" font-size="11" fill="#EF4444" font-weight="bold">Backward: gradient</text>
-  <text x="720" y="210" font-size="11" fill="#EF4444" font-weight="bold">BLOCKED at argmin!</text>
-  <text x="720" y="225" font-size="11" fill="#64748B">argmin has no gradient</text>
-  <text x="720" y="240" font-size="11" fill="#64748B">→ encoder never trains</text>
-  <text x="400" y="485" font-size="11" fill="#64748B" text-anchor="middle">z_e + (z_q - z_e).detach()  →  forward uses z_q, backward sees z_e</text>
-</svg>
-<figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;">Left: With straight-through estimator — gradients pass through $z_e$, bypassing the non-differentiable quantization. Right: Without straight-through — gradients are blocked at $\text{argmin}$, preventing the encoder from training.</figcaption>
-</figure>
+<div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 2rem 0;">
+  <figure style="flex: 1; min-width: 300px; text-align: center;">
+    <img src="/images/vqvae_with_ste.svg" alt="Computation graph with straight-through estimator" style="max-width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+    <figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;"><strong>With STE</strong> — The gradient flows through <code>detach</code> → <code>add</code>, bypassing <code>argmin</code> and enabling the encoder to train.</figcaption>
+  </figure>
+  <figure style="flex: 1; min-width: 300px; text-align: center;">
+    <img src="/images/vqvae_no_ste.svg" alt="Computation graph without straight-through estimator" style="max-width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+    <figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;"><strong>Without STE</strong> — No <code>detach</code>/<code>add</code> path; the gradient chain stops at <code>argmin</code>, so the encoder receives no training signal.</figcaption>
+  </figure>
+</div>
 
 ### Implementation
 
