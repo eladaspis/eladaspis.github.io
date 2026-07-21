@@ -164,7 +164,7 @@ If you're familiar with standard VAEs, VQ-VAE may seem like a misnomer. Standard
 | Component | Standard VAE | VQ-VAE |
 |---|---|---|
 | Reparameterization | $z = \mu + \sigma \odot \epsilon$ | Straight-through estimator (gradient copy) |
-| KL divergence | $\mathcal{D}_{KL}(\mathcal{N}(\mu,\sigma) \,\|\, \mathcal{N}(0,1))$ | Constant ($\log K$, ignored) |
+| KL divergence | $\mathcal{D}_{KL}(\mathcal{N}(\mu,\sigma) \parallel \mathcal{N}(0,1))$ | Constant ($\log K$, ignored) |
 | Latent space | Continuous Gaussian | Discrete categorical over codebook entries |
 | Prior | Fixed standard normal | Uniform (later replaced by a learned autoregressive model) |
 
