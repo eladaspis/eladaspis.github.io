@@ -142,6 +142,135 @@ $$\frac{\partial \mathcal{L}}{\partial z_e} \approx \frac{\partial \mathcal{L}}{
 
 This "straight-through" estimator enables end-to-end training despite discrete latents.
 
+Below is a visual comparison of the gradient flow with and without the straight-through estimator:
+
+<figure style="text-align: center; margin: 2rem 0;">
+<svg width="100%" max-width="800px" height="500" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;" class="w-full">
+  <rect width="800" height="500" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="200" y="35" font-size="15" font-weight="bold" fill="#1E293B" text-anchor="middle">With Straight-Through (✓)</text>
+  <text x="200" y="55" font-size="12" fill="#64748B" text-anchor="middle">z_q = z_e + (z_q − z_e).detach()</text>
+  <rect x="100" y="100" width="140" height="70" rx="8" fill="#4F46E5" />
+  <text x="170" y="135" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Encoder</text>
+  <text x="170" y="152" font-size="11" fill="#E9D5FF" text-anchor="middle">E_φ(x)</text>
+  <rect x="100" y="200" width="140" height="70" rx="8" fill="#EC4899" />
+  <text x="170" y="235" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Quantization</text>
+  <text x="170" y="252" font-size="10" fill="#FCE7F3" text-anchor="middle">argmin + Codebook</text>
+  <rect x="100" y="300" width="140" height="70" rx="8" fill="#10B981" />
+  <text x="170" y="335" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Decoder</text>
+  <text x="170" y="352" font-size="11" fill="#D1FAE5" text-anchor="middle">D_θ(z_q)</text>
+  <rect x="100" y="400" width="140" height="40" rx="6" fill="#EF4444" />
+  <text x="170" y="423" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Loss: L(x, x̂)</text>
+  <path d="M 170 170 L 170 190" stroke="#94A3B8" stroke-width="2" />
+  <polygon points="170,190 165,182 175,182" fill="#94A3B8" />
+  <path d="M 170 270 L 170 290" stroke="#94A3B8" stroke-width="2" />
+  <polygon points="170,290 165,282 175,282" fill="#94A3B8" />
+  <path d="M 170 370 L 170 390" stroke="#94A3B8" stroke-width="2" />
+  <polygon points="170,390 165,382 175,382" fill="#94A3B8" />
+  <path d="M 270 335 L 270 325 Q 280 260 270 235 L 270 135" stroke="#10B981" stroke-width="3" stroke-dasharray="8 4" fill="none" />
+  <polygon points="270,135 263,147 277,147" fill="#10B981" />
+  <path d="M 240 430 L 310 430 L 310 335" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 4" fill="none" />
+  <polygon points="310,335 305,343 315,343" fill="#EF4444" />
+  <text x="310" y="195" font-size="11" fill="#10B981" font-weight="bold">Backward: gradient</text>
+  <text x="310" y="210" font-size="11" fill="#10B981" font-weight="bold">bypasses quantization!</text>
+  <text x="310" y="225" font-size="11" fill="#64748B">∂L/∂z_e ≈ ∂L/∂z_q</text>
+  <line x1="400" y1="20" x2="400" y2="480" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 4" />
+  <text x="600" y="35" font-size="15" font-weight="bold" fill="#1E293B" text-anchor="middle">Without Straight-Through (✗)</text>
+  <text x="600" y="55" font-size="12" fill="#64748B" text-anchor="middle">z_q = codebook(argmin(distances))</text>
+  <rect x="500" y="100" width="140" height="70" rx="8" fill="#4F46E5" opacity="0.6" />
+  <text x="570" y="135" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Encoder</text>
+  <text x="570" y="152" font-size="11" fill="#E9D5FF" text-anchor="middle">E_φ(x)</text>
+  <rect x="500" y="200" width="140" height="70" rx="8" fill="#EC4899" opacity="0.6" />
+  <text x="570" y="235" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Quantization</text>
+  <text x="570" y="252" font-size="10" fill="#FCE7F3" text-anchor="middle">argmin + Codebook</text>
+  <line x1="510" y1="210" x2="630" y2="260" stroke="#EF4444" stroke-width="4" />
+  <line x1="630" y1="210" x2="510" y2="260" stroke="#EF4444" stroke-width="4" />
+  <rect x="500" y="300" width="140" height="70" rx="8" fill="#10B981" opacity="0.6" />
+  <text x="570" y="335" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Decoder</text>
+  <text x="570" y="352" font-size="11" fill="#D1FAE5" text-anchor="middle">D_θ(z_q)</text>
+  <rect x="500" y="400" width="140" height="40" rx="6" fill="#EF4444" opacity="0.6" />
+  <text x="570" y="423" font-size="12" font-weight="bold" fill="white" text-anchor="middle">Loss: L(x, x̂)</text>
+  <path d="M 570 170 L 570 190" stroke="#94A3B8" stroke-width="2" opacity="0.6" />
+  <polygon points="570,190 565,182 575,182" fill="#94A3B8" opacity="0.6" />
+  <path d="M 570 270 L 570 290" stroke="#94A3B8" stroke-width="2" opacity="0.6" />
+  <polygon points="570,290 565,282 575,282" fill="#94A3B8" opacity="0.6" />
+  <path d="M 570 370 L 570 390" stroke="#94A3B8" stroke-width="2" opacity="0.6" />
+  <polygon points="570,390 565,382 575,382" fill="#94A3B8" opacity="0.6" />
+  <path d="M 640 430 L 710 430 L 710 335" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 4" opacity="0.5" />
+  <polygon points="710,335 705,343 715,343" fill="#EF4444" opacity="0.5" />
+  <path d="M 710 300 L 710 260" stroke="#EF4444" stroke-width="3" stroke-dasharray="8 4" opacity="0.7" />
+  <rect x="695" y="260" width="30" height="20" rx="3" fill="#EF4444" />
+  <text x="710" y="274" font-size="11" font-weight="bold" fill="white" text-anchor="middle">✗</text>
+  <text x="720" y="195" font-size="11" fill="#EF4444" font-weight="bold">Backward: gradient</text>
+  <text x="720" y="210" font-size="11" fill="#EF4444" font-weight="bold">BLOCKED at argmin!</text>
+  <text x="720" y="225" font-size="11" fill="#64748B">argmin has no gradient</text>
+  <text x="720" y="240" font-size="11" fill="#64748B">→ encoder never trains</text>
+  <text x="400" y="485" font-size="11" fill="#64748B" text-anchor="middle">z_e + (z_q - z_e).detach()  →  forward uses z_q, backward sees z_e</text>
+</svg>
+<figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;">Left: With straight-through estimator — gradients pass through $z_e$, bypassing the non-differentiable quantization. Right: Without straight-through — gradients are blocked at $\text{argmin}$, preventing the encoder from training.</figcaption>
+</figure>
+
+### Implementation
+
+In code, the straight-through trick is elegantly simple. The quantized latent $z_q$ is treated as the output during the forward pass, but during backpropagation, the gradient flows **as if $z_e$ had been used directly**. This is achieved by:
+
+```python
+z_q = z_e + (z_q - z_e).detach()
+```
+
+When autograd computes gradients, `detach()` zeros out the gradient of the term inside. The forward pass uses the true quantized value $z_q$, but the gradient passes through $z_e$ as if it were the output. Here's a minimal VQ-VAE implementation:
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class VectorQuantizer(nn.Module):
+    def __init__(self, num_embeddings: int, embedding_dim: int, beta: float = 0.25):
+        super().__init__()
+        self.beta = beta
+        self.codebook = nn.Embedding(num_embeddings, embedding_dim)
+        self.codebook.weight.data.uniform_(-1/num_embeddings, 1/num_embeddings)
+
+    def forward(self, z_e: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        # z_e shape: (B, D, T) → (B, T, D) for distance computation
+        z_e_flat = z_e.permute(0, 2, 1).reshape(-1, z_e.size(1))
+        
+        # Compute distances: ||z_e - e||² for all codebook entries
+        distances = (
+            z_e_flat.pow(2).sum(1, keepdim=True)
+            - 2 * z_e_flat @ self.codebook.weight.T
+            + self.codebook.weight.pow(2).sum(1, keepdim=True).T
+        )
+        
+        # Nearest codebook lookup (argmin over codebook indices)
+        indices = distances.argmin(1)
+        z_q_flat = self.codebook(indices)  # (B*T, D)
+        
+        # Reshape back to original
+        z_q = z_q_flat.view_as(z_e)
+        
+        # ─── Straight-Through Estimator ───
+        # Forward:  uses z_q (actual quantized vectors)
+        # Backward: gradient flows through z_e (bypasses quantization)
+        z_q_st = z_e + (z_q - z_e).detach()
+        
+        # VQ-VAE loss components
+        recon_loss = F.mse_loss(self.decoder(z_q_st), x)
+        codebook_loss = F.mse_loss(z_q.detach(), z_e)
+        commitment_loss = F.mse_loss(z_q, z_e.detach())
+        
+        # Total loss: reconstruction + codebook + β * commitment
+        loss = recon_loss + codebook_loss + self.beta * commitment_loss
+        
+        return z_q_st, indices, loss
+```
+
+The key line is `z_e + (z_q - z_e).detach()`:
+- **Forward**: computes $z_q$ (the quantized vector) — `z_e` cancels out
+- **Backward**: `detach()` stops gradients through $(z_q - z_e)$, so only $z_e$ receives gradients
+
+This means the decoder receives discrete $z_q$ tokens, but the encoder is updated as if it produced $z_q$ continuously — the best of both worlds.
+
 ### Why This Matters
 
 VQ-VAE's discrete latents were a breakthrough, but they had a limitation: the single codebook operates at one granularity. Low-level details (like phonemes) and high-level structure (like prosody) get conflated in the same latent space. The next iteration tackled this head-on.
