@@ -144,14 +144,14 @@ This "straight-through" estimator enables end-to-end training despite discrete l
 
 Below are the actual PyTorch computation graphs generated with `torchview`, comparing the gradient flow with and without the straight-through estimator:
 
-<div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 2rem 0;">
-  <figure style="flex: 1; min-width: 300px; text-align: center;">
-    <img src="/images/vqvae_with_ste.svg" alt="Computation graph with straight-through estimator" style="max-width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
-    <figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;"><strong>With STE</strong> — The gradient flows through <code>detach</code> → <code>add</code>, bypassing <code>argmin</code> and enabling the encoder to train.</figcaption>
+<div style="display: flex; gap: 1rem; align-items: flex-start; justify-content: center; margin: 2rem 0;">
+  <figure style="flex: 1; min-width: 280px; margin: 0;">
+    <img src="/images/vqvae_with_ste.svg" alt="Computation graph with straight-through estimator" style="display: block; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+    <figcaption style="font-size: 0.8rem; color: #64748B; text-align: center; margin-top: 0.5rem;"><strong>With STE</strong> — <code>Quantize</code> → <code>sub</code> → <code>detach</code> → <code>add</code> creates a gradient bypass around quantization, letting gradients flow through the encoder.</figcaption>
   </figure>
-  <figure style="flex: 1; min-width: 300px; text-align: center;">
-    <img src="/images/vqvae_no_ste.svg" alt="Computation graph without straight-through estimator" style="max-width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
-    <figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;"><strong>Without STE</strong> — No <code>detach</code>/<code>add</code> path; the gradient chain stops at <code>argmin</code>, so the encoder receives no training signal.</figcaption>
+  <figure style="flex: 1; min-width: 280px; margin: 0;">
+    <img src="/images/vqvae_no_ste.svg" alt="Computation graph without straight-through estimator" style="display: block; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+    <figcaption style="font-size: 0.8rem; color: #64748B; text-align: center; margin-top: 0.5rem;"><strong>Without STE</strong> — <code>Quantize</code> feeds straight into <code>Decoder</code>; the <code>argmin</code> inside <code>Quantize</code> blocks gradients, so the encoder never trains.</figcaption>
   </figure>
 </div>
 
