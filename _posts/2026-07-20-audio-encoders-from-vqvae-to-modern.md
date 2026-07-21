@@ -46,8 +46,8 @@ The **Vector Quantized Variational Autoencoder** (VQ-VAE) by van den Oord et al.
 ### Architecture
 
 <figure style="text-align: center; margin: 2rem 0;">
-  <img src="/images/vqvae_fig1_paper.png" alt="Original VQ-VAE Figure 1 from van den Oord et al. (2017)" style="max-width: 500px; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
-  <figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;"><strong>Figure 1 from the original VQ-VAE paper</strong> (van den Oord et al., 2017). <strong>Left:</strong> The VQ-VAE architecture — input $x$ is encoded to $z_e(x)$, quantized to the nearest codebook entry $e_2$, and decoded to $\hat{x}$. <strong>Right:</strong> Visualization of the embedding space — the gradient $\nabla_z L$ (red arrow) pushes the encoder output toward $e_2$, enabling the straight-through gradient flow.</figcaption>
+  <img src="/images/vqvae_fig1_paper.png" alt="Original VQ-VAE Figure 1 from van den Oord et al. (2017)" style="max-width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+  <figcaption style="font-size: 0.9rem; color: #334155; margin-top: 0.5rem; line-height: 1.5;"><strong>Figure 1 from the original VQ-VAE paper</strong> (van den Oord et al., 2017). <strong>Left:</strong> The VQ-VAE architecture — input $x$ is encoded to $z_e(x)$, quantized to the nearest codebook entry $e_2$, and decoded to $\hat{x}$. <strong>Right:</strong> Visualization of the embedding space — the gradient $\nabla_z L$ (red arrow) pushes the encoder output toward $e_2$, enabling the straight-through gradient flow.</figcaption>
 </figure>
 
 ### Mathematical Formulation
@@ -87,11 +87,11 @@ Below are the actual PyTorch computation graphs generated with `torchview`, comp
 <div style="display: flex; gap: 1rem; align-items: flex-start; justify-content: center; margin: 2rem 0;">
   <figure style="flex: 1; min-width: 200px; margin: 0;">
     <img src="/images/vqvae_with_ste.svg" alt="Computation graph with straight-through estimator" style="display: block; max-height: 700px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px;" />
-    <figcaption style="font-size: 0.8rem; color: #64748B; text-align: center; margin-top: 0.5rem;"><strong>With STE</strong> — <code>Quantize</code> → <code>sub</code> → <code>detach</code> → <code>add</code> creates a gradient bypass around quantization, letting gradients flow through the encoder.</figcaption>
+    <figcaption style="font-size: 0.9rem; color: #334155; text-align: center; margin-top: 0.5rem; line-height: 1.5;"><strong>With STE</strong> — <code>Quantize</code> → <code>sub</code> → <code>detach</code> → <code>add</code> creates a gradient bypass around quantization, letting gradients flow through the encoder.</figcaption>
   </figure>
   <figure style="flex: 1; min-width: 200px; margin: 0;">
     <img src="/images/vqvae_no_ste.svg" alt="Computation graph without straight-through estimator" style="display: block; max-height: 700px; margin: 0 auto; border: 1px solid #E2E8F0; border-radius: 8px;" />
-    <figcaption style="font-size: 0.8rem; color: #64748B; text-align: center; margin-top: 0.5rem;"><strong>Without STE</strong> — <code>Quantize</code> feeds straight into <code>Decoder</code>; the <code>argmin</code> inside <code>Quantize</code> blocks gradients, so the encoder never trains.</figcaption>
+    <figcaption style="font-size: 0.9rem; color: #334155; text-align: center; margin-top: 0.5rem; line-height: 1.5;"><strong>Without STE</strong> — <code>Quantize</code> feeds straight into <code>Decoder</code>; the <code>argmin</code> inside <code>Quantize</code> blocks gradients, so the encoder never trains.</figcaption>
   </figure>
 </div>
 
