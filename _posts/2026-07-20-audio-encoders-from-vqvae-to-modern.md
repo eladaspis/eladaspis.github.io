@@ -146,11 +146,11 @@ Below are the actual PyTorch computation graphs generated with `torchview`, comp
 
 <div style="display: flex; gap: 1rem; align-items: flex-start; justify-content: center; margin: 2rem 0;">
   <figure style="flex: 1; min-width: 280px; margin: 0;">
-    <img src="/images/vqvae_with_ste.svg" alt="Computation graph with straight-through estimator" style="display: block; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+    <img src="/images/vqvae_with_ste.svg" alt="Computation graph with straight-through estimator" style="display: block; width: 100%; max-width: 340px; border: 1px solid #E2E8F0; border-radius: 8px;" />
     <figcaption style="font-size: 0.8rem; color: #64748B; text-align: center; margin-top: 0.5rem;"><strong>With STE</strong> — <code>Quantize</code> → <code>sub</code> → <code>detach</code> → <code>add</code> creates a gradient bypass around quantization, letting gradients flow through the encoder.</figcaption>
   </figure>
-  <figure style="flex: 1; min-width: 280px; margin: 0;">
-    <img src="/images/vqvae_no_ste.svg" alt="Computation graph without straight-through estimator" style="display: block; width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+  <figure style="flex: 1; min-width: 200px; margin: 0;">
+    <img src="/images/vqvae_no_ste.svg" alt="Computation graph without straight-through estimator" style="display: block; width: 100%; max-width: 340px; border: 1px solid #E2E8F0; border-radius: 8px;" />
     <figcaption style="font-size: 0.8rem; color: #64748B; text-align: center; margin-top: 0.5rem;"><strong>Without STE</strong> — <code>Quantize</code> feeds straight into <code>Decoder</code>; the <code>argmin</code> inside <code>Quantize</code> blocks gradients, so the encoder never trains.</figcaption>
   </figure>
 </div>
