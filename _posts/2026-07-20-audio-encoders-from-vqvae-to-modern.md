@@ -172,9 +172,9 @@ So why the "VAE" name? Because the **ELBO framework still applies**. The evidenc
 
 $$\log p(x) \geq \mathbb{E}_{q(z|x)}[\log p(x|z)] - \mathcal{D}_{KL}(q(z|x) \,\|\, p(z))$$
 
-VQ-VAE defines a valid posterior $q(z|x)$ (the argmin over the codebook), a prior $p(z)$ (uniform over $K$ categories), and a decoder $p(x|z)$. Because the posterior is deterministic, the expectation reduces to a single term. And because the prior is uniform, the KL divergence is constant ($\log K$) — independent of the model parameters, so it can be dropped during optimization.
+VQ-VAE defines a valid posterior $q(z\vert x)$ (the argmin over the codebook), a prior $p(z)$ (uniform over $K$ categories), and a decoder $p(x\vert z)$. Because the posterior is deterministic, the expectation reduces to a single term. And because the prior is uniform, the KL divergence is constant ($\log K$) — independent of the model parameters, so it can be dropped during optimization.
 
-What remains is exactly the reconstruction loss $\log p(x|z_q)$. As the paper states: *"We view this model as a VAE in which we can bound $\log p(x)$ with the ELBO."*
+What remains is exactly the reconstruction loss $\log p(x\vert z_q)$. As the paper states: *"We view this model as a VAE in which we can bound $\log p(x)$ with the ELBO."*
 
 The deeper insight is that VQ-VAE trades the **reparameterization trick** for a **quantization bottleneck + straight-through estimator**. This is not a hack — it's a deliberate architectural choice that solves posterior collapse (a notorious VAE failure mode where the decoder ignores the latent $z$ entirely). By forcing the latent to be discrete, the decoder **must** use it. The "variational" in VQ-VAE refers to the ELBO structure, not to stochastic sampling.
 
@@ -296,7 +296,7 @@ $$\mathcal{L} = \sum_{i=1}^2 \left[ \mathcal{L}_{\text{recon}}^{(i)} + \mathcal{
 
 ### Autoregressive Prior
 
-A PixelCNN-style autoregressive model learns $p(z_1)$ and $p(z_2 | z_1)$ for generation:
+A PixelCNN-style autoregressive model learns $p(z_1)$ and $p(z_2 \vert z_1)$ for generation:
 
 $$p(z) = \prod_i p(z_i | z_{<i})$$
 
@@ -1056,7 +1056,7 @@ If you're working in this space, my advice: **understand the codec first**. The 
 | $L$ | Number of RVQ levels |
 | $\lambda$ | Loss weighting hyperparameters |
 | $p(\cdot)$ | Probability distribution |
-| $\| \cdot \|_1, \| \cdot \|_2$ | L1/L2 norms |
+| $\lVert \cdot \rVert_1, \lVert \cdot \rVert_2$ | L1/L2 norms |
 
 ---
 
