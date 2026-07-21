@@ -172,9 +172,9 @@ So why the "VAE" name? Because the **ELBO framework still applies**. The evidenc
 
 $$\log p(x) \geq \mathbb{E}_{q(z|x)}[\log p(x|z)] - \mathcal{D}_{KL}(q(z|x) \,\|\, p(z))$$
 
-VQ-VAE defines a valid posterior $q(z|x)$ (the argmin over the codebook), a prior $p(z)$ (uniform over $K$ categories), and a decoder $p(x|z)$. The posterior is deterministic, so the expectation reduces to a single term. And because the prior is uniform, the KL divergence evaluates to a constant $\log K$ — it doesn't depend on the model parameters and can be dropped during optimization.
+VQ-VAE defines a valid posterior $q(z|x)$ (the argmin over the codebook), a prior $p(z)$ (uniform over $K$ categories), and a decoder $p(x|z)$. Because the posterior is deterministic, the expectation reduces to a single term. And because the prior is uniform, the KL divergence is constant ($\log K$) — independent of the model parameters, so it can be dropped during optimization.
 
-What remains is exactly the reconstruction loss $\log p(x|z_q)$. The VQ-VAE paper puts it plainly: *"We view this model as a VAE in which we can bound $\log p(x)$ with the ELBO."*
+What remains is exactly the reconstruction loss $\log p(x|z_q)$. As the paper states: *"We view this model as a VAE in which we can bound $\log p(x)$ with the ELBO."*
 
 The deeper insight is that VQ-VAE trades the **reparameterization trick** for a **quantization bottleneck + straight-through estimator**. This is not a hack — it's a deliberate architectural choice that solves posterior collapse (a notorious VAE failure mode where the decoder ignores the latent $z$ entirely). By forcing the latent to be discrete, the decoder **must** use it. The "variational" in VQ-VAE refers to the ELBO structure, not to stochastic sampling.
 
