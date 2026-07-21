@@ -110,6 +110,11 @@ Here's the core idea at a glance:
   </svg>
 </div>
 
+<figure style="text-align: center; margin: 2rem 0;">
+  <img src="/images/vqvae_fig1_paper.png" alt="Original VQ-VAE Figure 1 from van den Oord et al. (2017)" style="max-width: 100%; border: 1px solid #E2E8F0; border-radius: 8px;" />
+  <figcaption style="font-size: 0.85rem; color: #64748B; margin-top: 0.5rem;"><strong>Figure 1 from the original VQ-VAE paper</strong> (van den Oord et al., 2017). <strong>Left:</strong> The VQ-VAE architecture — input $x$ is encoded to $z_e(x)$, quantized to the nearest codebook entry $e_2$, and decoded to $\hat{x}$. <strong>Right:</strong> Visualization of the embedding space — the gradient $\nabla_z L$ (red arrow) pushes the encoder output toward $e_2$, enabling the straight-through gradient flow.</figcaption>
+</figure>
+
 ### Mathematical Formulation
 
 **Encoder** maps input waveform $x \in \mathbb{R}^T$ to continuous latent $z_e \in \mathbb{R}^{H \times W \times D}$:
