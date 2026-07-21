@@ -157,15 +157,26 @@ The key line is `z_e + (z_q - z_e).detach()`:
 
 This means the decoder receives discrete $z_q$ tokens, but the encoder is updated as if it produced $z_q$ continuously — the best of both worlds.
 
-### Why Is It Called a VAE?
+### Wait, Where's the Variational?
 
-Despite the name, VQ-VAE differs from a standard VAE in key ways:
+If you're familiar with standard VAEs, VQ-VAE may seem like a misnomer. Standard VAEs rely on three key components: a Gaussian reparameterization trick, a closed-form KL divergence against a standard normal prior, and continuous latent variables. VQ-VAE has **none** of these:
 
-- **No KL divergence**: The posterior $q(z|x)$ is deterministic (argmin), and the prior is assumed uniform, so the KL term is constant and ignored during training.
-- **No reparameterization trick**: Instead of sampling from a parametric distribution, VQ-VAE uses nearest-neighbor lookup. Gradients are copied through the straight-through estimator rather than backpropagated through a stochastic sample.
-- **Discrete latent space**: Standard VAEs use continuous Gaussians; VQ-VAE uses a categorical distribution over codebook entries.
+| Component | Standard VAE | VQ-VAE |
+|---|---|---|
+| Reparameterization | $z = \mu + \sigma \odot \epsilon$ | Straight-through estimator (gradient copy) |
+| KL divergence | $\mathcal{D}_{KL}(\mathcal{N}(\mu,\sigma) \,\|\, \mathcal{N}(0,1))$ | Constant ($\log K$, ignored) |
+| Latent space | Continuous Gaussian | Discrete categorical over codebook entries |
+| Prior | Fixed standard normal | Uniform (later replaced by a learned autoregressive model) |
 
-So why the "VAE" name? Because the architecture fits the VAE framework structurally: an encoder produces a posterior $q(z|x)$, a prior $p(z)$ is defined over the latent space, and a decoder models $p(x|z)$. The ELBO still holds — it just reduces to reconstruction loss when the prior is uniform and the posterior is deterministic. VQ-VAE is a VAE where the **reparameterization is replaced by quantization + straight-through estimation**.
+So why the "VAE" name? Because the **ELBO framework still applies**. The evidence lower bound is:
+
+$$\log p(x) \geq \mathbb{E}_{q(z|x)}[\log p(x|z)] - \mathcal{D}_{KL}(q(z|x) \,\|\, p(z))$$
+
+VQ-VAE defines a valid posterior $q(z|x)$ (the argmin over the codebook), a prior $p(z)$ (uniform over $K$ categories), and a decoder $p(x|z)$. The posterior is deterministic, so the expectation reduces to a single term. And because the prior is uniform, the KL divergence evaluates to a constant $\log K$ — it doesn't depend on the model parameters and can be dropped during optimization.
+
+What remains is exactly the reconstruction loss $\log p(x|z_q)$. The VQ-VAE paper puts it plainly: *"We view this model as a VAE in which we can bound $\log p(x)$ with the ELBO."*
+
+The deeper insight is that VQ-VAE trades the **reparameterization trick** for a **quantization bottleneck + straight-through estimator**. This is not a hack — it's a deliberate architectural choice that solves posterior collapse (a notorious VAE failure mode where the decoder ignores the latent $z$ entirely). By forcing the latent to be discrete, the decoder **must** use it. The "variational" in VQ-VAE refers to the ELBO structure, not to stochastic sampling.
 
 ### Why This Matters
 
