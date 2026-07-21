@@ -1,1 +1,3 @@
-[]
+- url: /blog/2026/07/20/audio-encoders-from-vqvae-to-modern/
+  title: "Audio Encoders: From VQ-VAE to Modern"
+  description: "A technical deep-dive on the evolution of neural audio encoders, from VQ-VAE through SoundStream, EnCodec, and AudioLM — with architecture diagrams and mathematical formulations."
