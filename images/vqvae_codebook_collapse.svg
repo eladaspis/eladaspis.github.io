@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 310" font-family="'Inter', 'Source Sans 3', system-ui, sans-serif">
+  <defs>
+    <linearGradient id="healthyBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.06"/>
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.02"/>
+    </linearGradient>
+    <linearGradient id="collapsedBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.06"/>
+      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.02"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ====== LEFT: HEALTHY CODEBOOK ====== -->
+  <rect x="10" y="10" width="350" height="290" rx="12" fill="url(#healthyBg)" stroke="#10b981" stroke-width="1.5"/>
+  <text x="185" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="#047857">HEALTHY CODEBOOK</text>
+  <text x="185" y="55" text-anchor="middle" font-size="10" fill="#059669">Uniform Voronoi Tessellation</text>
+
+  <!-- Voronoi grid (4x4 cells, simplified) -->
+  <!-- Vertical lines -->
+  <line x1="98" y1="70" x2="98" y2="250" stroke="#6ee7b7" stroke-width="1"/>
+  <line x1="185" y1="70" x2="185" y2="250" stroke="#6ee7b7" stroke-width="1"/>
+  <line x1="272" y1="70" x2="272" y2="250" stroke="#6ee7b7" stroke-width="1"/>
+  <!-- Horizontal lines -->
+  <line x1="30" y1="115" x2="340" y2="115" stroke="#6ee7b7" stroke-width="1"/>
+  <line x1="30" y1="160" x2="340" y2="160" stroke="#6ee7b7" stroke-width="1"/>
+  <line x1="30" y1="205" x2="340" y2="205" stroke="#6ee7b7" stroke-width="1"/>
+  <!-- Border -->
+  <rect x="30" y="70" width="310" height="180" rx="4" fill="none" stroke="#a7f3d0" stroke-width="1.5"/>
+
+  <!-- Codebook vectors (dots) — uniformly distributed -->
+  <circle cx="64" cy="92" r="7" fill="#10b981"/>
+  <text x="64" y="96" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₁</text>
+  <circle cx="141" cy="92" r="7" fill="#10b981"/>
+  <text x="141" y="96" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₂</text>
+  <circle cx="228" cy="92" r="7" fill="#10b981"/>
+  <text x="228" y="96" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₃</text>
+  <circle cx="306" cy="92" r="7" fill="#10b981"/>
+  <text x="306" y="96" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₄</text>
+
+  <circle cx="64" cy="137" r="7" fill="#10b981"/>
+  <text x="64" y="141" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₅</text>
+  <circle cx="141" cy="137" r="7" fill="#10b981"/>
+  <text x="141" y="141" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₆</text>
+  <circle cx="228" cy="137" r="7" fill="#10b981"/>
+  <text x="228" y="141" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₇</text>
+  <circle cx="306" cy="137" r="7" fill="#10b981"/>
+  <text x="306" y="141" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₈</text>
+
+  <circle cx="64" cy="182" r="7" fill="#10b981"/>
+  <text x="64" y="186" text-anchor="middle" font-size="7" fill="white" font-weight="700">e₉</text>
+  <circle cx="141" cy="182" r="7" fill="#10b981"/>
+  <text x="141" y="186" text-anchor="middle" font-size="6.5" fill="white" font-weight="700">e₁₀</text>
+  <circle cx="228" cy="182" r="7" fill="#10b981"/>
+  <text x="228" y="186" text-anchor="middle" font-size="6.5" fill="white" font-weight="700">e₁₁</text>
+  <circle cx="306" cy="182" r="7" fill="#10b981"/>
+  <text x="306" y="186" text-anchor="middle" font-size="6.5" fill="white" font-weight="700">e₁₂</text>
+
+  <circle cx="64" cy="227" r="7" fill="#10b981"/>
+  <text x="64" y="231" text-anchor="middle" font-size="6.5" fill="white" font-weight="700">e₁₃</text>
+  <circle cx="141" cy="227" r="7" fill="#10b981"/>
+  <text x="141" y="231" text-anchor="middle" font-size="6.5" fill="white" font-weight="700">e₁₄</text>
+  <circle cx="228" cy="227" r="7" fill="#10b981"/>
+  <text x="228" y="231" text-anchor="middle" font-size="6.5" fill="white" font-weight="700">e₁₅</text>
+  <circle cx="306" cy="227" r="7" fill="#10b981"/>
+  <text x="306" y="231" text-anchor="middle" font-size="6.5" fill="white" font-weight="700">e₁₆</text>
+
+  <!-- Data points scattered -->
+  <circle cx="50" cy="80" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="75" cy="105" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="120" cy="78" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="155" cy="100" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="210" cy="85" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="245" cy="100" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="290" cy="80" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="320" cy="105" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="45" cy="130" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="80" cy="150" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="125" cy="125" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="160" cy="148" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="215" cy="128" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="248" cy="150" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="288" cy="125" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="325" cy="148" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="52" cy="175" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="78" cy="195" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="130" cy="170" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="155" cy="193" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="216" cy="172" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="242" cy="195" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="295" cy="170" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="318" cy="195" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="55" cy="218" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="78" cy="240" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="128" cy="215" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="158" cy="238" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="218" cy="220" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="240" cy="240" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="298" cy="218" r="2.5" fill="#6366f1" opacity="0.6"/>
+  <circle cx="320" cy="238" r="2.5" fill="#6366f1" opacity="0.6"/>
+
+  <!-- Metrics -->
+  <text x="185" y="270" text-anchor="middle" font-size="11" font-weight="700" fill="#047857">Perplexity ≈ K = 1024</text>
+  <text x="185" y="285" text-anchor="middle" font-size="10" fill="#059669">100% codebook utilization</text>
+
+  <!-- ====== RIGHT: COLLAPSED CODEBOOK ====== -->
+  <rect x="420" y="10" width="350" height="290" rx="12" fill="url(#collapsedBg)" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="595" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">COLLAPSED CODEBOOK</text>
+  <text x="595" y="55" text-anchor="middle" font-size="10" fill="#ef4444">Winner-Take-All Degeneracy</text>
+
+  <!-- Single dominant region — fills entire box -->
+  <rect x="440" y="70" width="310" height="180" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+
+  <!-- The single "winner" vector — big and prominent -->
+  <circle cx="595" cy="140" r="14" fill="#ef4444"/>
+  <text x="595" y="145" text-anchor="middle" font-size="10" fill="white" font-weight="700">e₁</text>
+
+  <!-- Dense cluster of data around winner -->
+  <circle cx="575" cy="120" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="610" cy="125" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="590" cy="155" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="605" cy="110" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="580" cy="145" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="615" cy="150" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="585" cy="130" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="600" cy="160" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="570" cy="135" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="620" cy="138" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="588" cy="112" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="602" cy="148" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="578" cy="158" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="608" cy="118" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="595" cy="165" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="565" cy="150" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="625" cy="128" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="582" cy="105" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="612" cy="162" r="2.5" fill="#6366f1" opacity="0.7"/>
+  <circle cx="575" cy="168" r="2.5" fill="#6366f1" opacity="0.7"/>
+
+  <!-- Dead vectors scattered and grayed out -->
+  <circle cx="470" cy="95" r="6" fill="none" stroke="#d4d4d8" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="470" y="99" text-anchor="middle" font-size="6" fill="#a1a1aa">e₂</text>
+  <line x1="465" y1="90" x2="475" y2="100" stroke="#d4d4d8" stroke-width="1"/>
+
+  <circle cx="720" cy="100" r="6" fill="none" stroke="#d4d4d8" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="720" y="104" text-anchor="middle" font-size="6" fill="#a1a1aa">e₃</text>
+  <line x1="715" y1="95" x2="725" y2="105" stroke="#d4d4d8" stroke-width="1"/>
+
+  <circle cx="465" cy="200" r="6" fill="none" stroke="#d4d4d8" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="465" y="204" text-anchor="middle" font-size="6" fill="#a1a1aa">e₄</text>
+  <line x1="460" y1="195" x2="470" y2="205" stroke="#d4d4d8" stroke-width="1"/>
+
+  <circle cx="725" cy="195" r="6" fill="none" stroke="#d4d4d8" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="725" y="199" text-anchor="middle" font-size="6" fill="#a1a1aa">e₅</text>
+  <line x1="720" y1="190" x2="730" y2="200" stroke="#d4d4d8" stroke-width="1"/>
+
+  <circle cx="500" cy="155" r="6" fill="none" stroke="#d4d4d8" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="500" y="159" text-anchor="middle" font-size="6" fill="#a1a1aa">e₆</text>
+  <line x1="495" y1="150" x2="505" y2="160" stroke="#d4d4d8" stroke-width="1"/>
+
+  <circle cx="690" cy="160" r="6" fill="none" stroke="#d4d4d8" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="690" y="164" text-anchor="middle" font-size="6" fill="#a1a1aa">e₇</text>
+  <line x1="685" y1="155" x2="695" y2="165" stroke="#d4d4d8" stroke-width="1"/>
+
+  <!-- "Wins 99%" annotation -->
+  <text x="595" y="185" text-anchor="middle" font-size="9" fill="#dc2626" font-style="italic">(wins 99% of assignments)</text>
+
+  <!-- Dead label -->
+  <rect x="455" y="218" width="60" height="18" rx="4" fill="#f5f5f5" stroke="#d4d4d8" stroke-width="1"/>
+  <text x="485" y="231" text-anchor="middle" font-size="8" fill="#a1a1aa" font-weight="600">DEAD</text>
+  <text x="485" y="244" text-anchor="middle" font-size="7" fill="#a1a1aa">0% usage</text>
+
+  <!-- Metrics -->
+  <text x="595" y="270" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">Perplexity ≈ 1</text>
+  <text x="595" y="285" text-anchor="middle" font-size="10" fill="#ef4444">~98% codebook wasted</text>
+
+  <!-- VS divider -->
+  <text x="390" y="160" text-anchor="middle" font-size="18" font-weight="800" fill="#94a3b8">vs</text>
+</svg>

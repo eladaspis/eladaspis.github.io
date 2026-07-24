@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 220" font-family="'Inter', 'Source Sans 3', system-ui, sans-serif">
+  <defs>
+    <!-- Gradient fills for blocks -->
+    <linearGradient id="encGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#818cf8;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#818cf8;stop-opacity:0.08"/>
+    </linearGradient>
+    <linearGradient id="quantGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.18"/>
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0.08"/>
+    </linearGradient>
+    <linearGradient id="decGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.08"/>
+    </linearGradient>
+    <!-- Arrow marker -->
+    <marker id="arrowBlack" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#334155"/>
+    </marker>
+    <marker id="arrowSTE" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="920" height="220" fill="none"/>
+
+  <!-- Input x -->
+  <rect x="20" y="70" width="60" height="50" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="50" y="100" text-anchor="middle" font-size="15" font-weight="600" fill="#334155">x</text>
+  <text x="50" y="115" text-anchor="middle" font-size="9" fill="#64748b">ℝᵀ</text>
+
+  <!-- Arrow x -> Encoder -->
+  <line x1="82" y1="95" x2="128" y2="95" stroke="#334155" stroke-width="1.5" marker-end="url(#arrowBlack)"/>
+
+  <!-- Encoder -->
+  <rect x="130" y="55" width="120" height="80" rx="10" fill="url(#encGrad)" stroke="#818cf8" stroke-width="1.8"/>
+  <text x="190" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#4338ca">Encoder</text>
+  <text x="190" y="106" text-anchor="middle" font-size="12" fill="#4338ca" font-style="italic">E<tspan font-size="9" dy="3">ϕ</tspan></text>
+
+  <!-- Arrow Encoder -> z_e -->
+  <line x1="252" y1="95" x2="298" y2="95" stroke="#334155" stroke-width="1.5" marker-end="url(#arrowBlack)"/>
+  <text x="275" y="85" text-anchor="middle" font-size="11" fill="#64748b">z<tspan font-size="8" dy="2">e</tspan></text>
+
+  <!-- z_e node -->
+  <circle cx="310" cy="95" r="12" fill="#e0e7ff" stroke="#818cf8" stroke-width="1.5"/>
+  <text x="310" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#4338ca">z<tspan font-size="8" dy="2">e</tspan></text>
+
+  <!-- Arrow z_e -> Quantizer -->
+  <line x1="324" y1="95" x2="370" y2="95" stroke="#334155" stroke-width="1.5" marker-end="url(#arrowBlack)"/>
+
+  <!-- Quantizer -->
+  <rect x="372" y="55" width="130" height="80" rx="10" fill="url(#quantGrad)" stroke="#f59e0b" stroke-width="1.8"/>
+  <text x="437" y="83" text-anchor="middle" font-size="14" font-weight="700" fill="#b45309">Quantizer</text>
+  <text x="437" y="100" text-anchor="middle" font-size="11" fill="#b45309">argmin ‖z<tspan font-size="8" dy="2">e</tspan><tspan dy="-2"> − e</tspan><tspan font-size="8" dy="2">k</tspan><tspan dy="-2">‖₂</tspan></text>
+  <text x="437" y="118" text-anchor="middle" font-size="10" fill="#92400e" font-style="italic">non-differentiable</text>
+
+  <!-- Arrow Quantizer -> z_q -->
+  <line x1="504" y1="95" x2="550" y2="95" stroke="#334155" stroke-width="1.5" marker-end="url(#arrowBlack)"/>
+  <text x="527" y="85" text-anchor="middle" font-size="11" fill="#64748b">z<tspan font-size="8" dy="2">q</tspan></text>
+
+  <!-- z_q node -->
+  <circle cx="562" cy="95" r="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="562" y="100" text-anchor="middle" font-size="11" font-weight="600" fill="#b45309">z<tspan font-size="8" dy="2">q</tspan></text>
+
+  <!-- Arrow z_q -> Decoder -->
+  <line x1="576" y1="95" x2="622" y2="95" stroke="#334155" stroke-width="1.5" marker-end="url(#arrowBlack)"/>
+
+  <!-- Decoder -->
+  <rect x="624" y="55" width="120" height="80" rx="10" fill="url(#decGrad)" stroke="#10b981" stroke-width="1.8"/>
+  <text x="684" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#047857">Decoder</text>
+  <text x="684" y="106" text-anchor="middle" font-size="12" fill="#047857" font-style="italic">D<tspan font-size="9" dy="3">θ</tspan></text>
+
+  <!-- Arrow Decoder -> x_hat -->
+  <line x1="746" y1="95" x2="792" y2="95" stroke="#334155" stroke-width="1.5" marker-end="url(#arrowBlack)"/>
+
+  <!-- Output x̂ -->
+  <rect x="794" y="70" width="60" height="50" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="824" y="100" text-anchor="middle" font-size="15" font-weight="600" fill="#334155">x̂</text>
+  <text x="824" y="115" text-anchor="middle" font-size="9" fill="#64748b">ℝᵀ</text>
+
+  <!-- STE Gradient Bypass (curved arrow on top) -->
+  <path d="M 562 80 C 562 20, 310 20, 310 80" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrowSTE)"/>
+  <text x="436" y="25" text-anchor="middle" font-size="12" font-weight="700" fill="#ef4444">STE Gradient Bypass</text>
+  <text x="436" y="42" text-anchor="middle" font-size="10" fill="#ef4444">∇z<tspan font-size="7" dy="2">e</tspan><tspan dy="-2"> ℒ ≈ ∇z</tspan><tspan font-size="7" dy="2">q</tspan><tspan dy="-2"> ℒ</tspan></text>
+
+  <!-- Forward pass label -->
+  <text x="437" y="160" text-anchor="middle" font-size="10" fill="#64748b">
+    <tspan font-weight="600">Forward:</tspan> z<tspan font-size="7" dy="1">q</tspan><tspan dy="-1" font-size="7" baseline-shift="super">STE</tspan> = z<tspan font-size="7" dy="1">e</tspan><tspan dy="-1"> + sg[z</tspan><tspan font-size="7" dy="1">q</tspan><tspan dy="-1"> − z</tspan><tspan font-size="7" dy="1">e</tspan><tspan dy="-1">]</tspan>
+  </text>
+
+  <!-- Codebook (small box) -->
+  <rect x="390" y="170" width="95" height="35" rx="5" fill="#fefce8" stroke="#eab308" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="437" y="192" text-anchor="middle" font-size="10" fill="#854d0e">Codebook 𝒞</text>
+  <text x="437" y="202" text-anchor="middle" font-size="8" fill="#92400e">{e₁, …, e<tspan font-size="6" dy="1">K</tspan><tspan dy="-1">} ⊂ ℝᴰ</tspan></text>
+
+  <!-- Dashed line from codebook to quantizer -->
+  <line x1="437" y1="170" x2="437" y2="137" stroke="#eab308" stroke-width="1" stroke-dasharray="3,2"/>
+</svg>
