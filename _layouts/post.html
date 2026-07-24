@@ -6,7 +6,7 @@ layout: default
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    max-width: 80rem;
+    max-width: 82rem;
     margin: 0 auto;
     padding: 0 1rem;
   }
@@ -21,7 +21,7 @@ layout: default
     }
     .post-sidebar {
       display: block !important;
-      width: 17.5rem;
+      width: 20rem;
       flex-shrink: 0;
       position: sticky;
       top: 1.5rem;
@@ -33,8 +33,8 @@ layout: default
   .toc-card {
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 0.75rem;
-    padding: 0.875rem;
+    border-radius: 0.875rem;
+    padding: 1.125rem;
     box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
   }
 
@@ -93,13 +93,13 @@ layout: default
     <!-- Right Sidebar Table of Contents -->
     <aside class="hidden post-sidebar">
       <div class="toc-card">
-        <h3 class="text-xs font-sans font-bold uppercase tracking-wider text-text-body mb-2.5 flex items-center gap-1.5 border-b border-border-subtle pb-2">
-          <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <h3 class="text-sm font-sans font-bold uppercase tracking-wider text-text-body mb-3 flex items-center gap-2 border-b border-border-subtle pb-2.5">
+          <svg class="w-4 h-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
           </svg>
           Table of Contents
         </h3>
-        <nav id="sticky-toc" class="text-xs space-y-1">
+        <nav id="sticky-toc" class="text-sm space-y-1">
           <!-- Dynamically populated via JS -->
         </nav>
       </div>
@@ -117,7 +117,7 @@ layout: default
   </button>
 
   <!-- Mobile Drawer -->
-  <div id="toc-mobile-menu" class="hidden absolute right-0 mt-2 w-64 max-h-[70vh] overflow-y-auto bg-surface border border-border rounded-xl shadow-xl p-3 z-50 text-xs">
+  <div id="toc-mobile-menu" class="hidden absolute right-0 mt-2 w-72 max-h-[70vh] overflow-y-auto bg-surface border border-border rounded-xl shadow-xl p-4 z-50 text-xs">
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle">
       <span class="font-bold text-text text-xs uppercase tracking-wider">Navigation</span>
       <button id="toc-close-btn" class="text-text-muted hover:text-text text-base leading-none">&times;</button>
@@ -170,17 +170,17 @@ layout: default
       function renderNavHTML() {
         return sections.map((sec) => {
           const subsHTML = sec.subs.map(sub => {
-            const indentClass = sub.level === 'h3' ? 'pl-3 text-xs font-normal text-text-muted' : 'pl-5 text-[11px] font-normal text-text-subtle';
-            return `<a href="#${sub.id}" class="toc-link block py-0.5 px-2 rounded-r transition-colors ${indentClass}" data-target="${sub.id}">${sub.title}</a>`;
+            const indentClass = sub.level === 'h3' ? 'pl-3.5 text-xs font-normal text-text-muted' : 'pl-6 text-[12px] font-normal text-text-subtle';
+            return `<a href="#${sub.id}" class="toc-link block py-1 px-2.5 rounded-r transition-colors ${indentClass}" data-target="${sub.id}">${sub.title}</a>`;
           }).join('');
 
           return `
-            <div class="toc-group mb-1" data-section="${sec.h2.id}">
-              <a href="#${sec.h2.id}" class="toc-link toc-h2 block py-1 px-2 rounded-r font-semibold text-text-body text-xs hover:bg-slate-100 transition-colors flex items-center justify-between" data-target="${sec.h2.id}">
+            <div class="toc-group mb-1.5" data-section="${sec.h2.id}">
+              <a href="#${sec.h2.id}" class="toc-link toc-h2 block py-1.5 px-2.5 rounded-r font-semibold text-text-body text-sm hover:bg-slate-100 transition-colors flex items-center justify-between" data-target="${sec.h2.id}">
                 <span>${sec.h2.title}</span>
-                ${sec.subs.length ? '<span class="toc-arrow text-[10px] text-text-subtle transition-transform ml-1">▸</span>' : ''}
+                ${sec.subs.length ? '<span class="toc-arrow text-xs text-text-subtle transition-transform ml-1">▸</span>' : ''}
               </a>
-              ${sec.subs.length ? `<div class="toc-sub-container hidden pl-1 border-l border-slate-200 ml-2 mt-0.5 space-y-0.5">${subsHTML}</div>` : ''}
+              ${sec.subs.length ? `<div class="toc-sub-container hidden pl-1 border-l border-slate-200 ml-2.5 mt-1 space-y-0.5">${subsHTML}</div>` : ''}
             </div>
           `;
         }).join('');
@@ -225,7 +225,6 @@ layout: default
           }
         });
 
-        // If no heading active yet, default to first section
         if (!activeHeadingId && sections.length) {
           activeHeadingId = sections[0].h2.id;
         }
