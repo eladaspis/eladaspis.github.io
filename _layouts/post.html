@@ -29,6 +29,30 @@ layout: default
       overflow-y: auto;
     }
   }
+
+  .toc-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .toc-link {
+    transition: all 0.15s ease-in-out;
+    border-left: 2px solid transparent;
+  }
+  .toc-link:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    border-left-color: #94a3b8;
+  }
+  .toc-link.active-toc {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 600;
+    border-left-color: #2563eb;
+  }
 </style>
 
 <article class="py-6 md:py-10 bg-surface">
@@ -63,8 +87,8 @@ layout: default
 
     <!-- Right Sidebar Table of Contents -->
     <aside class="hidden post-sidebar">
-      <div class="p-4 rounded-xl border border-border bg-surface-muted/80 backdrop-blur shadow-sm">
-        <h3 class="text-xs font-sans font-bold uppercase tracking-wider text-text mb-3 flex items-center gap-1.5 border-b border-border-subtle pb-2">
+      <div class="toc-card">
+        <h3 class="text-xs font-sans font-bold uppercase tracking-wider text-text-body mb-3 flex items-center gap-1.5 border-b border-border-subtle pb-2">
           <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
           </svg>
@@ -128,7 +152,7 @@ layout: default
         }
         
         const cleanTitle = text.replace(/^#+\s*/, '');
-        const link = `<a href="#${heading.id}" class="toc-link block py-1 px-1.5 rounded hover:bg-surface-alt hover:text-text transition-colors ${indentClass}" data-target="${heading.id}">${cleanTitle}</a>`;
+        const link = `<a href="#${heading.id}" class="toc-link block py-1 px-2 rounded-r ${indentClass}" data-target="${heading.id}">${cleanTitle}</a>`;
         
         desktopHtml += link;
         mobileHtml += link;
@@ -171,10 +195,9 @@ layout: default
 
         tocLinks.forEach(link => {
           if (link.getAttribute('data-target') === currentId) {
-            link.classList.add('text-text', 'bg-surface-alt', 'font-bold');
-            link.classList.remove('text-text-muted', 'text-text-subtle');
+            link.classList.add('active-toc');
           } else {
-            link.classList.remove('text-text', 'bg-surface-alt', 'font-bold');
+            link.classList.remove('active-toc');
           }
         });
       }
