@@ -236,7 +236,7 @@ This trade-off is a primary reason why modern architectures moved toward **multi
 
 Below is a PyTorch `VectorQuantizer` module that incorporates STE, Cosine/L2 metrics, EMA updates, perplexity tracking, and basic dead-code re-initialization.
 
-```python
+{% highlight python %}
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -376,6 +376,7 @@ class VectorQuantizer(nn.Module):
         indices_out = indices.view(B, T)
 
         return z_q_st, indices_out, vq_loss, perplexity
+{% endhighlight %}
 
 
 ---
