@@ -1,11 +1,11 @@
 ---
 layout: default
 ---
-<article class="py-8 md:py-12 bg-surface">
+<article class="py-6 md:py-10 bg-surface">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="lg:grid lg:grid-cols-12 lg:gap-8 xl:gap-12">
+    <div class="lg:grid lg:grid-cols-12 lg:gap-8">
       <!-- Main Content Column -->
-      <main class="lg:col-span-8 xl:col-span-8">
+      <main class="lg:col-span-9 xl:col-span-9">
         <header class="mb-8">
           <h1 class="font-display text-3xl md:text-4xl font-semibold text-text">
             {{ page.title }}
@@ -32,16 +32,16 @@ layout: default
         </footer>
       </main>
 
-      <!-- Sticky Table of Contents Sidebar (Top Right) -->
-      <aside class="hidden lg:block lg:col-span-4 xl:col-span-4">
-        <div class="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto p-5 rounded-xl border border-border-subtle bg-surface-alt/80 backdrop-blur shadow-sm">
-          <h3 class="font-display text-lg font-semibold text-text mb-3 flex items-center gap-2">
-            <svg class="w-4 h-4 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- Compact Sticky Table of Contents Sidebar (Top Right) -->
+      <aside class="hidden lg:block lg:col-span-3 xl:col-span-3">
+        <div class="sticky top-12 max-h-[calc(100vh-4rem)] overflow-y-auto p-3.5 rounded-lg border border-border-subtle bg-surface-alt/90 backdrop-blur shadow-2xs">
+          <h3 class="text-[11px] font-sans font-semibold uppercase tracking-wider text-text-subtle mb-2.5 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-text-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
             </svg>
-            Table of Contents
+            On this page
           </h3>
-          <nav id="sticky-toc" class="text-sm text-text-muted space-y-1">
+          <nav id="sticky-toc" class="text-xs text-text-muted space-y-0.5">
             <!-- Dynamically populated via JS -->
           </nav>
         </div>
@@ -50,22 +50,22 @@ layout: default
   </div>
 </article>
 
-<!-- Floating Mobile/Universal Sticky Navigation Button & Menu -->
-<div class="lg:hidden fixed top-20 right-4 z-40">
-  <button id="toc-toggle-btn" class="bg-surface/90 backdrop-blur border border-border text-text px-3 py-2 rounded-full shadow-md text-xs font-sans font-medium flex items-center gap-1.5 hover:bg-surface-alt transition-colors">
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<!-- Floating Mobile Sticky Navigation Button & Menu -->
+<div class="lg:hidden fixed top-16 right-4 z-40">
+  <button id="toc-toggle-btn" class="bg-surface/90 backdrop-blur border border-border text-text px-2.5 py-1.5 rounded-full shadow-sm text-xs font-sans font-medium flex items-center gap-1 hover:bg-surface-alt transition-colors">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
     </svg>
     <span>Contents</span>
   </button>
 
   <!-- Mobile Drawer -->
-  <div id="toc-mobile-menu" class="hidden absolute right-0 mt-2 w-72 max-h-[75vh] overflow-y-auto bg-surface border border-border rounded-xl shadow-xl p-4 z-50 text-sm">
+  <div id="toc-mobile-menu" class="hidden absolute right-0 mt-2 w-64 max-h-[70vh] overflow-y-auto bg-surface border border-border rounded-lg shadow-xl p-3 z-50 text-xs">
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle">
-      <span class="font-semibold text-text font-display">Navigation</span>
-      <button id="toc-close-btn" class="text-text-muted hover:text-text">&times;</button>
+      <span class="font-semibold text-text text-xs uppercase tracking-wider">Navigation</span>
+      <button id="toc-close-btn" class="text-text-muted hover:text-text text-base leading-none">&times;</button>
     </div>
-    <nav id="sticky-toc-mobile" class="space-y-1 text-text-muted">
+    <nav id="sticky-toc-mobile" class="space-y-0.5 text-text-muted">
       <!-- Dynamically populated via JS -->
     </nav>
   </div>
@@ -83,7 +83,6 @@ layout: default
     let mobileHtml = '';
 
     headings.forEach((heading, idx) => {
-      // Skip the inline Table of Contents heading itself if present
       if (heading.textContent.trim().toLowerCase().includes('table of contents')) return;
 
       if (!heading.id) {
@@ -91,9 +90,9 @@ layout: default
       }
       
       const isH3 = heading.tagName.toLowerCase() === 'h3';
-      const indentClass = isH3 ? 'pl-4 text-xs' : 'font-medium';
+      const indentClass = isH3 ? 'pl-3 text-[11px] text-text-subtle' : 'font-medium text-xs text-text-body';
       
-      const link = `<a href="#${heading.id}" class="toc-link block py-1 px-2 rounded hover:bg-surface-muted hover:text-text transition-colors ${indentClass}" data-target="${heading.id}">${heading.textContent.replace(/^#+\s*/, '')}</a>`;
+      const link = `<a href="#${heading.id}" class="toc-link block py-0.5 px-1.5 rounded hover:bg-surface-muted hover:text-text transition-colors ${indentClass}" data-target="${heading.id}">${heading.textContent.replace(/^#+\s*/, '')}</a>`;
       
       desktopHtml += link;
       mobileHtml += link;
@@ -129,7 +128,7 @@ layout: default
       let currentId = '';
       headings.forEach(heading => {
         const top = heading.getBoundingClientRect().top;
-        if (top <= 140) {
+        if (top <= 100) {
           currentId = heading.id;
         }
       });
@@ -137,10 +136,9 @@ layout: default
       tocLinks.forEach(link => {
         if (link.getAttribute('data-target') === currentId) {
           link.classList.add('text-text', 'bg-surface-muted', 'font-semibold');
-          link.classList.remove('text-text-muted');
+          link.classList.remove('text-text-muted', 'text-text-subtle');
         } else {
           link.classList.remove('text-text', 'bg-surface-muted', 'font-semibold');
-          link.classList.add('text-text-muted');
         }
       });
     }
