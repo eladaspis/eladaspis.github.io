@@ -242,7 +242,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class ProductionVectorQuantizer(nn.Module):
+class VectorQuantizer(nn.Module):
     """
     Research-Grade Vector Quantizer supporting:
     1. Straight-Through Estimator (STE)
