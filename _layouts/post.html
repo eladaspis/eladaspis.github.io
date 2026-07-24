@@ -21,7 +21,7 @@ layout: default
     }
     .post-sidebar {
       display: block !important;
-      width: 17rem;
+      width: 17.5rem;
       flex-shrink: 0;
       position: sticky;
       top: 1.5rem;
@@ -34,7 +34,7 @@ layout: default
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 0.75rem;
-    padding: 1rem;
+    padding: 0.875rem;
     box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
   }
 
@@ -52,6 +52,11 @@ layout: default
     color: #0f172a;
     font-weight: 600;
     border-left-color: #2563eb;
+  }
+
+  .toc-arrow {
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
   }
 </style>
 
@@ -88,7 +93,7 @@ layout: default
     <!-- Right Sidebar Table of Contents -->
     <aside class="hidden post-sidebar">
       <div class="toc-card">
-        <h3 class="text-xs font-sans font-bold uppercase tracking-wider text-text-body mb-3 flex items-center gap-1.5 border-b border-border-subtle pb-2">
+        <h3 class="text-xs font-sans font-bold uppercase tracking-wider text-text-body mb-2.5 flex items-center gap-1.5 border-b border-border-subtle pb-2">
           <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
           </svg>
@@ -126,14 +131,15 @@ layout: default
 <script>
   (function initTOC() {
     function buildTOC() {
-      const headings = document.querySelectorAll('.id-content h2, .id-content h3, .id-content h4');
+      const headings = Array.from(document.querySelectorAll('.id-content h2, .id-content h3, .id-content h4'));
       const desktopToc = document.getElementById('sticky-toc');
       const mobileToc = document.getElementById('sticky-toc-mobile');
       
       if (!headings.length || !desktopToc) return;
 
-      let desktopHtml = '';
-      let mobileHtml = '';
+      // Group headings into main sections (H2)
+      let sections = [];
+      let currentSection = null;
 
       headings.forEach((heading, idx) => {
         const text = heading.textContent.trim();
@@ -142,24 +148,47 @@ layout: default
         if (!heading.id) {
           heading.id = 'heading-' + idx;
         }
-        
+
         const tag = heading.tagName.toLowerCase();
-        let indentClass = 'font-semibold text-text-body';
-        if (tag === 'h3') {
-          indentClass = 'pl-2.5 text-text-muted font-normal';
-        } else if (tag === 'h4') {
-          indentClass = 'pl-5 text-text-subtle text-[11px] font-normal';
-        }
-        
         const cleanTitle = text.replace(/^#+\s*/, '');
-        const link = `<a href="#${heading.id}" class="toc-link block py-1 px-2 rounded-r ${indentClass}" data-target="${heading.id}">${cleanTitle}</a>`;
-        
-        desktopHtml += link;
-        mobileHtml += link;
+
+        if (tag === 'h2') {
+          currentSection = {
+            h2: { id: heading.id, title: cleanTitle },
+            subs: []
+          };
+          sections.push(currentSection);
+        } else if (currentSection) {
+          currentSection.subs.push({
+            id: heading.id,
+            title: cleanTitle,
+            level: tag
+          });
+        }
       });
 
-      desktopToc.innerHTML = desktopHtml;
-      if (mobileToc) mobileToc.innerHTML = mobileHtml;
+      function renderNavHTML() {
+        return sections.map((sec) => {
+          const subsHTML = sec.subs.map(sub => {
+            const indentClass = sub.level === 'h3' ? 'pl-3 text-xs font-normal text-text-muted' : 'pl-5 text-[11px] font-normal text-text-subtle';
+            return `<a href="#${sub.id}" class="toc-link block py-0.5 px-2 rounded-r transition-colors ${indentClass}" data-target="${sub.id}">${sub.title}</a>`;
+          }).join('');
+
+          return `
+            <div class="toc-group mb-1" data-section="${sec.h2.id}">
+              <a href="#${sec.h2.id}" class="toc-link toc-h2 block py-1 px-2 rounded-r font-semibold text-text-body text-xs hover:bg-slate-100 transition-colors flex items-center justify-between" data-target="${sec.h2.id}">
+                <span>${sec.h2.title}</span>
+                ${sec.subs.length ? '<span class="toc-arrow text-[10px] text-text-subtle transition-transform ml-1">▸</span>' : ''}
+              </a>
+              ${sec.subs.length ? `<div class="toc-sub-container hidden pl-1 border-l border-slate-200 ml-2 mt-0.5 space-y-0.5">${subsHTML}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      const html = renderNavHTML();
+      desktopToc.innerHTML = html;
+      if (mobileToc) mobileToc.innerHTML = html;
 
       // Toggle Mobile Menu
       const toggleBtn = document.getElementById('toc-toggle-btn');
@@ -181,20 +210,51 @@ layout: default
         });
       }
 
-      // ScrollSpy Active Heading Highlighting
-      const tocLinks = document.querySelectorAll('.toc-link');
-      
+      // ScrollSpy & Collapsible Accordion Logic
+      const allGroups = document.querySelectorAll('.toc-group');
+      const allLinks = document.querySelectorAll('.toc-link');
+
       function onScroll() {
-        let currentId = '';
+        let activeHeadingId = '';
+        let activeH2Id = '';
+
         headings.forEach(heading => {
           const top = heading.getBoundingClientRect().top;
           if (top <= 140) {
-            currentId = heading.id;
+            activeHeadingId = heading.id;
           }
         });
 
-        tocLinks.forEach(link => {
-          if (link.getAttribute('data-target') === currentId) {
+        // If no heading active yet, default to first section
+        if (!activeHeadingId && sections.length) {
+          activeHeadingId = sections[0].h2.id;
+        }
+
+        // Find which section (h2) contains activeHeadingId
+        sections.forEach(sec => {
+          if (sec.h2.id === activeHeadingId || sec.subs.some(sub => sub.id === activeHeadingId)) {
+            activeH2Id = sec.h2.id;
+          }
+        });
+
+        // Expand active section, collapse all others
+        allGroups.forEach(group => {
+          const secId = group.getAttribute('data-section');
+          const subContainer = group.querySelector('.toc-sub-container');
+          const arrow = group.querySelector('.toc-arrow');
+
+          if (secId === activeH2Id) {
+            if (subContainer) subContainer.classList.remove('hidden');
+            if (arrow) arrow.style.transform = 'rotate(90deg)';
+          } else {
+            if (subContainer) subContainer.classList.add('hidden');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+          }
+        });
+
+        // Highlight active link
+        allLinks.forEach(link => {
+          if (link.getAttribute('data-target') === activeHeadingId) {
             link.classList.add('active-toc');
           } else {
             link.classList.remove('active-toc');
