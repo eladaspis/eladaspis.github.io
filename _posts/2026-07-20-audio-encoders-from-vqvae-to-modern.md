@@ -11,27 +11,7 @@ Vector Quantized Variational Autoencoders (VQ-VAE) offer a different approach to
 
 In this post, we'll walk through the theoretical foundations of VQ-VAE, how gradient estimation works in this setup, and some of the practical challenges encountered during training, such as codebook collapse and capacity degeneration.
 
----
 
-## Table of Contents
-
-1. [The Foundation: VQ-VAE & Information Bottlenecks](#1-the-foundation-vq-vae-information-bottlenecks)
-   - [1.1 Variational & Information-Theoretic Derivation](#11-variational--information-theoretic-derivation)
-   - [1.2 Architecture & Formal Loss Formulation](#12-architecture--formal-loss-formulation)
-   - [1.3 Gradient Flow & The Straight-Through Estimator (STE)](#13-gradient-flow--the-straight-through-estimator-ste)
-2. [Deep-Dive: Core Challenges & Pathologies](#14-core-challenges--pathologies)
-   - [Challenge 1: Codebook Collapse](#challenge-1-codebook-collapse)
-   - [Mitigation 1: Exponential Moving Average (EMA) Updates](#1-exponential-moving-average-ema-codebook-updates)
-   - [Mitigation 2: Dead Code Re-initialization (Codebook Resetting)](#2-dead-code-re-initialization-codebook-resetting)
-   - [Mitigation 3: L2 Normalization & Spherical Quantization](#3-l2-normalization--spherical-quantization)
-   - [Mitigation 4: Subspace Projection (Factorized Quantization)](#4-subspace-projection-factorized-quantization)
-   - [Challenge 2: Audio-Specific Bottlenecks](#challenge-2-audio-specific-bottlenecks-time-vs-frequency)
-3. [PyTorch Implementation](#15-pytorch-implementation)
-4. [Summary](#summary)
-5. [References](#references)
-6. [Appendix: Mathematical Notation Reference](#appendix-mathematical-notation-reference)
-
----
 
 ## 1. The Foundation: VQ-VAE & Information Bottlenecks
 
