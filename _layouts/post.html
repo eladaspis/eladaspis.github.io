@@ -21,7 +21,7 @@ layout: default
     }
     .post-sidebar {
       display: block !important;
-      width: 20rem;
+      width: 20.5rem;
       flex-shrink: 0;
       position: sticky;
       top: 1.5rem;
@@ -40,7 +40,7 @@ layout: default
 
   .toc-link {
     transition: all 0.15s ease-in-out;
-    border-left: 2px solid transparent;
+    border-left: 2.5px solid transparent;
   }
   .toc-link:hover {
     background-color: #f1f5f9;
@@ -170,17 +170,17 @@ layout: default
       function renderNavHTML() {
         return sections.map((sec) => {
           const subsHTML = sec.subs.map(sub => {
-            const indentClass = sub.level === 'h3' ? 'pl-3.5 text-xs font-normal text-text-muted' : 'pl-6 text-[12px] font-normal text-text-subtle';
-            return `<a href="#${sub.id}" class="toc-link block py-1 px-2.5 rounded-r transition-colors ${indentClass}" data-target="${sub.id}">${sub.title}</a>`;
+            const indentClass = sub.level === 'h3' ? 'pl-3 text-xs font-normal text-text-muted' : 'pl-5 text-[12px] font-normal text-text-subtle';
+            return `<a href="#${sub.id}" class="toc-link block py-1 px-3 rounded-r transition-colors ${indentClass}" data-target="${sub.id}">${sub.title}</a>`;
           }).join('');
 
           return `
             <div class="toc-group mb-1.5" data-section="${sec.h2.id}">
-              <a href="#${sec.h2.id}" class="toc-link toc-h2 block py-1.5 px-2.5 rounded-r font-semibold text-text-body text-sm hover:bg-slate-100 transition-colors flex items-center justify-between" data-target="${sec.h2.id}">
+              <a href="#${sec.h2.id}" class="toc-link toc-h2 block py-1.5 px-3 rounded-r font-semibold text-text-body text-sm hover:bg-slate-100 transition-colors flex items-center justify-between" data-target="${sec.h2.id}">
                 <span>${sec.h2.title}</span>
                 ${sec.subs.length ? '<span class="toc-arrow text-xs text-text-subtle transition-transform ml-1">▸</span>' : ''}
               </a>
-              ${sec.subs.length ? `<div class="toc-sub-container hidden pl-1 border-l border-slate-200 ml-2.5 mt-1 space-y-0.5">${subsHTML}</div>` : ''}
+              ${sec.subs.length ? `<div class="toc-sub-container hidden border-l-2 border-slate-200 ml-3.5 pl-2 mt-1 space-y-1">${subsHTML}</div>` : ''}
             </div>
           `;
         }).join('');
