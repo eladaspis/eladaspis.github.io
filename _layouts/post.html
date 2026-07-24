@@ -34,7 +34,7 @@ layout: default
 
       <!-- Right Sidebar Table of Contents -->
       <aside class="hidden lg:block w-full lg:w-1/4 sticky top-6 self-start">
-        <div class="p-4 rounded-xl border border-border bg-surface-muted/60 backdrop-blur shadow-sm max-h-[calc(100vh-3rem)] overflow-y-auto">
+        <div class="p-4 rounded-xl border border-border bg-surface-muted/80 backdrop-blur shadow-sm max-h-[calc(100vh-3rem)] overflow-y-auto">
           <h3 class="text-xs font-sans font-bold uppercase tracking-wider text-text mb-3 flex items-center gap-1.5 border-b border-border-subtle pb-2">
             <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
@@ -72,85 +72,93 @@ layout: default
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const headings = document.querySelectorAll('.id-content h2, .id-content h3, .id-content h4');
-    const desktopToc = document.getElementById('sticky-toc');
-    const mobileToc = document.getElementById('sticky-toc-mobile');
-    
-    if (!headings.length || !desktopToc) return;
-
-    let desktopHtml = '';
-    let mobileHtml = '';
-
-    headings.forEach((heading, idx) => {
-      const text = heading.textContent.trim();
-      if (text.toLowerCase().includes('table of contents')) return;
-
-      if (!heading.id) {
-        heading.id = 'heading-' + idx;
-      }
+  (function initTOC() {
+    function buildTOC() {
+      const headings = document.querySelectorAll('.id-content h2, .id-content h3, .id-content h4');
+      const desktopToc = document.getElementById('sticky-toc');
+      const mobileToc = document.getElementById('sticky-toc-mobile');
       
-      const tag = heading.tagName.toLowerCase();
-      let indentClass = 'font-semibold text-text-body';
-      if (tag === 'h3') {
-        indentClass = 'pl-2 text-text-muted';
-      } else if (tag === 'h4') {
-        indentClass = 'pl-4 text-text-subtle text-[11px]';
-      }
-      
-      const cleanTitle = text.replace(/^#+\s*/, '');
-      const link = `<a href="#${heading.id}" class="toc-link block py-1 px-1.5 rounded hover:bg-surface-alt hover:text-text transition-colors ${indentClass}" data-target="${heading.id}">${cleanTitle}</a>`;
-      
-      desktopHtml += link;
-      mobileHtml += link;
-    });
+      if (!headings.length || !desktopToc) return;
 
-    desktopToc.innerHTML = desktopHtml;
-    if (mobileToc) mobileToc.innerHTML = mobileHtml;
+      let desktopHtml = '';
+      let mobileHtml = '';
 
-    // Toggle Mobile Menu
-    const toggleBtn = document.getElementById('toc-toggle-btn');
-    const closeBtn = document.getElementById('toc-close-btn');
-    const mobileMenu = document.getElementById('toc-mobile-menu');
+      headings.forEach((heading, idx) => {
+        const text = heading.textContent.trim();
+        if (text.toLowerCase().includes('table of contents')) return;
 
-    if (toggleBtn && mobileMenu) {
-      toggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        mobileMenu.classList.toggle('hidden');
-      });
-      if (closeBtn) {
-        closeBtn.addEventListener('click', () => mobileMenu.classList.add('hidden'));
-      }
-      document.addEventListener('click', (e) => {
-        if (!mobileMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
-          mobileMenu.classList.add('hidden');
+        if (!heading.id) {
+          heading.id = 'heading-' + idx;
         }
+        
+        const tag = heading.tagName.toLowerCase();
+        let indentClass = 'font-semibold text-text-body';
+        if (tag === 'h3') {
+          indentClass = 'pl-2.5 text-text-muted font-normal';
+        } else if (tag === 'h4') {
+          indentClass = 'pl-5 text-text-subtle text-[11px] font-normal';
+        }
+        
+        const cleanTitle = text.replace(/^#+\s*/, '');
+        const link = `<a href="#${heading.id}" class="toc-link block py-1 px-1.5 rounded hover:bg-surface-alt hover:text-text transition-colors ${indentClass}" data-target="${heading.id}">${cleanTitle}</a>`;
+        
+        desktopHtml += link;
+        mobileHtml += link;
       });
+
+      desktopToc.innerHTML = desktopHtml;
+      if (mobileToc) mobileToc.innerHTML = mobileHtml;
+
+      // Toggle Mobile Menu
+      const toggleBtn = document.getElementById('toc-toggle-btn');
+      const closeBtn = document.getElementById('toc-close-btn');
+      const mobileMenu = document.getElementById('toc-mobile-menu');
+
+      if (toggleBtn && mobileMenu) {
+        toggleBtn.onclick = function(e) {
+          e.stopPropagation();
+          mobileMenu.classList.toggle('hidden');
+        };
+        if (closeBtn) {
+          closeBtn.onclick = function() { mobileMenu.classList.add('hidden'); };
+        }
+        document.addEventListener('click', function(e) {
+          if (!mobileMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+            mobileMenu.classList.add('hidden');
+          }
+        });
+      }
+
+      // ScrollSpy Active Heading Highlighting
+      const tocLinks = document.querySelectorAll('.toc-link');
+      
+      function onScroll() {
+        let currentId = '';
+        headings.forEach(heading => {
+          const top = heading.getBoundingClientRect().top;
+          if (top <= 140) {
+            currentId = heading.id;
+          }
+        });
+
+        tocLinks.forEach(link => {
+          if (link.getAttribute('data-target') === currentId) {
+            link.classList.add('text-text', 'bg-surface-alt', 'font-bold');
+            link.classList.remove('text-text-muted', 'text-text-subtle');
+          } else {
+            link.classList.remove('text-text', 'bg-surface-alt', 'font-bold');
+          }
+        });
+      }
+
+      window.addEventListener('scroll', onScroll);
+      onScroll();
     }
 
-    // ScrollSpy Active Heading Highlighting
-    const tocLinks = document.querySelectorAll('.toc-link');
-    
-    function onScroll() {
-      let currentId = '';
-      headings.forEach(heading => {
-        const top = heading.getBoundingClientRect().top;
-        if (top <= 120) {
-          currentId = heading.id;
-        }
-      });
-
-      tocLinks.forEach(link => {
-        if (link.getAttribute('data-target') === currentId) {
-          link.classList.add('text-text', 'bg-surface-alt', 'font-bold');
-          link.classList.remove('text-text-muted', 'text-text-subtle');
-        } else {
-          link.classList.remove('text-text', 'bg-surface-alt', 'font-bold');
-        }
-      });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', buildTOC);
+    } else {
+      buildTOC();
     }
-
-    window.addEventListener('scroll', onScroll);
-    onScroll();
-  });
+  })();
 </script>
