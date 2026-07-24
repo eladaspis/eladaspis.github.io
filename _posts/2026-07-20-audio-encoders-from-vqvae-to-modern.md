@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Vector Quantized VAEs (VQ-VAE): Theoretical Foundations & Research Challenges"
+title: "Vector Quantized VAEs (VQ-VAE): Math, Codebook Collapse & PyTorch Implementation"
 date: 2026-07-20
 tags: [audio, machine-learning, vq-vae, neural-compression, deep-learning]
 math: true
