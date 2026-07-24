@@ -3,9 +3,9 @@ layout: default
 ---
 <article class="py-6 md:py-10 bg-surface">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+    <div class="flex flex-col lg:flex-row gap-8 items-start relative">
       <!-- Main Content Column -->
-      <main class="lg:col-span-9 xl:col-span-9">
+      <div class="w-full lg:w-3/4 min-w-0">
         <header class="mb-8">
           <h1 class="font-display text-3xl md:text-4xl font-semibold text-text">
             {{ page.title }}
@@ -30,18 +30,18 @@ layout: default
             ← Back to blog
           </a>
         </footer>
-      </main>
+      </div>
 
-      <!-- Compact Sticky Table of Contents Sidebar (Top Right) -->
-      <aside class="hidden lg:block lg:col-span-3 xl:col-span-3">
-        <div class="sticky top-12 max-h-[calc(100vh-4rem)] overflow-y-auto p-3.5 rounded-lg border border-border-subtle bg-surface-alt/90 backdrop-blur shadow-2xs">
-          <h3 class="text-[11px] font-sans font-semibold uppercase tracking-wider text-text-subtle mb-2.5 flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5 text-text-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- Right Sidebar Table of Contents -->
+      <aside class="hidden lg:block w-full lg:w-1/4 sticky top-6 self-start">
+        <div class="p-4 rounded-xl border border-border bg-surface-muted/60 backdrop-blur shadow-sm max-h-[calc(100vh-3rem)] overflow-y-auto">
+          <h3 class="text-xs font-sans font-bold uppercase tracking-wider text-text mb-3 flex items-center gap-1.5 border-b border-border-subtle pb-2">
+            <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
             </svg>
-            On this page
+            Table of Contents
           </h3>
-          <nav id="sticky-toc" class="text-xs text-text-muted space-y-0.5">
+          <nav id="sticky-toc" class="text-xs space-y-1">
             <!-- Dynamically populated via JS -->
           </nav>
         </div>
@@ -52,20 +52,20 @@ layout: default
 
 <!-- Floating Mobile Sticky Navigation Button & Menu -->
 <div class="lg:hidden fixed top-16 right-4 z-40">
-  <button id="toc-toggle-btn" class="bg-surface/90 backdrop-blur border border-border text-text px-2.5 py-1.5 rounded-full shadow-sm text-xs font-sans font-medium flex items-center gap-1 hover:bg-surface-alt transition-colors">
-    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <button id="toc-toggle-btn" class="bg-surface/95 backdrop-blur border border-border text-text px-3 py-1.5 rounded-full shadow-md text-xs font-sans font-medium flex items-center gap-1.5 hover:bg-surface-alt transition-colors">
+    <svg class="w-3.5 h-3.5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
     </svg>
     <span>Contents</span>
   </button>
 
   <!-- Mobile Drawer -->
-  <div id="toc-mobile-menu" class="hidden absolute right-0 mt-2 w-64 max-h-[70vh] overflow-y-auto bg-surface border border-border rounded-lg shadow-xl p-3 z-50 text-xs">
+  <div id="toc-mobile-menu" class="hidden absolute right-0 mt-2 w-64 max-h-[70vh] overflow-y-auto bg-surface border border-border rounded-xl shadow-xl p-3 z-50 text-xs">
     <div class="flex items-center justify-between pb-2 mb-2 border-b border-border-subtle">
-      <span class="font-semibold text-text text-xs uppercase tracking-wider">Navigation</span>
+      <span class="font-bold text-text text-xs uppercase tracking-wider">Navigation</span>
       <button id="toc-close-btn" class="text-text-muted hover:text-text text-base leading-none">&times;</button>
     </div>
-    <nav id="sticky-toc-mobile" class="space-y-0.5 text-text-muted">
+    <nav id="sticky-toc-mobile" class="space-y-1 text-text-muted">
       <!-- Dynamically populated via JS -->
     </nav>
   </div>
@@ -73,7 +73,7 @@ layout: default
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const headings = document.querySelectorAll('.id-content h2, .id-content h3');
+    const headings = document.querySelectorAll('.id-content h2, .id-content h3, .id-content h4');
     const desktopToc = document.getElementById('sticky-toc');
     const mobileToc = document.getElementById('sticky-toc-mobile');
     
@@ -83,16 +83,23 @@ layout: default
     let mobileHtml = '';
 
     headings.forEach((heading, idx) => {
-      if (heading.textContent.trim().toLowerCase().includes('table of contents')) return;
+      const text = heading.textContent.trim();
+      if (text.toLowerCase().includes('table of contents')) return;
 
       if (!heading.id) {
         heading.id = 'heading-' + idx;
       }
       
-      const isH3 = heading.tagName.toLowerCase() === 'h3';
-      const indentClass = isH3 ? 'pl-3 text-[11px] text-text-subtle' : 'font-medium text-xs text-text-body';
+      const tag = heading.tagName.toLowerCase();
+      let indentClass = 'font-semibold text-text-body';
+      if (tag === 'h3') {
+        indentClass = 'pl-2 text-text-muted';
+      } else if (tag === 'h4') {
+        indentClass = 'pl-4 text-text-subtle text-[11px]';
+      }
       
-      const link = `<a href="#${heading.id}" class="toc-link block py-0.5 px-1.5 rounded hover:bg-surface-muted hover:text-text transition-colors ${indentClass}" data-target="${heading.id}">${heading.textContent.replace(/^#+\s*/, '')}</a>`;
+      const cleanTitle = text.replace(/^#+\s*/, '');
+      const link = `<a href="#${heading.id}" class="toc-link block py-1 px-1.5 rounded hover:bg-surface-alt hover:text-text transition-colors ${indentClass}" data-target="${heading.id}">${cleanTitle}</a>`;
       
       desktopHtml += link;
       mobileHtml += link;
@@ -128,17 +135,17 @@ layout: default
       let currentId = '';
       headings.forEach(heading => {
         const top = heading.getBoundingClientRect().top;
-        if (top <= 100) {
+        if (top <= 120) {
           currentId = heading.id;
         }
       });
 
       tocLinks.forEach(link => {
         if (link.getAttribute('data-target') === currentId) {
-          link.classList.add('text-text', 'bg-surface-muted', 'font-semibold');
+          link.classList.add('text-text', 'bg-surface-alt', 'font-bold');
           link.classList.remove('text-text-muted', 'text-text-subtle');
         } else {
-          link.classList.remove('text-text', 'bg-surface-muted', 'font-semibold');
+          link.classList.remove('text-text', 'bg-surface-alt', 'font-bold');
         }
       });
     }
