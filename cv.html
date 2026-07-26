@@ -12,28 +12,20 @@ title: CV - Elad Aspis
 
   <div class="text-sm text-text-body space-y-1 md:text-right print:text-right">
     <p>
-      <a href="{{ site.url }}" class="hover:text-text no-underline">
-        {% include icons/globe.html class="w-4 h-4 inline mr-1" %}
-        {% assign url_parts = site.url | split: "//" %}{{ url_parts[1] }}
-      </a>
+      {% include icons/globe.html class="w-4 h-4 inline mr-1" %}
+      {% assign url_parts = site.url | split: "//" %}{{ url_parts[1] }}
     </p>
     <p>
-      <a href="https://github.com/{{ site.github_username }}" class="hover:text-text no-underline">
-        {% include icons/github.html class="w-4 h-4 inline mr-1" %}
-        {{ site.github_username }}
-      </a>
+      {% include icons/github.html class="w-4 h-4 inline mr-1" %}
+      {{ site.github_username }}
     </p>
     <p>
-      <a href="https://linkedin.com/in/{{ site.linkedin_username }}" class="hover:text-text no-underline">
-        {% include icons/linkedin.html class="w-4 h-4 inline mr-1" %}
-        {{ site.linkedin_username }}
-      </a>
+      {% include icons/linkedin.html class="w-4 h-4 inline mr-1" %}
+      {{ site.linkedin_username }}
     </p>
     <p>
-      <a href="mailto:{{ site.email }}" class="hover:text-text no-underline">
-        {% include icons/envelope.html class="w-4 h-4 inline mr-1" %}
-        {{ site.email }}
-      </a>
+      {% include icons/envelope.html class="w-4 h-4 inline mr-1" %}
+      {{ site.email }}
     </p>
   </div>
 </header>
