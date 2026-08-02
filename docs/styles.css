@@ -92,12 +92,13 @@ body.nav-fixed, body {
   }
 }
 
-/* CV Layout Styles */
+/* CV Layout Styles - Left Aligned Content */
 .cv-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 1.5rem 1rem;
   box-sizing: border-box;
+  text-align: left !important;
 }
 
 .cv-header-block {
@@ -106,6 +107,7 @@ body.nav-fixed, body {
   gap: 1.25rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid #e5e7eb;
+  text-align: left !important;
 }
 
 @media (min-width: 768px) {
@@ -121,6 +123,7 @@ body.nav-fixed, body {
   font-weight: 600;
   color: #111827;
   margin: 0;
+  text-align: left !important;
 }
 
 .cv-subtitle {
@@ -128,6 +131,7 @@ body.nav-fixed, body {
   color: #4b5563;
   margin-top: 0.25rem;
   margin-bottom: 0;
+  text-align: left !important;
 }
 
 .cv-contact {
@@ -140,7 +144,13 @@ body.nav-fixed, body {
 
 @media (min-width: 768px) {
   .cv-contact {
-    text-align: right;
+    text-align: right !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cv-contact {
+    text-align: left !important;
   }
 }
 
@@ -158,6 +168,7 @@ body.nav-fixed, body {
 
 .cv-section {
   margin-top: 2rem;
+  text-align: left !important;
 }
 
 .cv-section-title {
@@ -165,6 +176,7 @@ body.nav-fixed, body {
   font-weight: 600;
   color: #111827;
   margin-bottom: 1rem;
+  text-align: left !important;
 }
 
 .cv-entry {
@@ -172,6 +184,7 @@ body.nav-fixed, body {
   flex-direction: column;
   gap: 0.25rem;
   margin-bottom: 1.25rem;
+  text-align: left !important;
 }
 
 @media (min-width: 768px) {
@@ -183,12 +196,14 @@ body.nav-fixed, body {
 
 .cv-entry-info {
   flex: 1;
+  text-align: left !important;
 }
 
 .cv-entry-heading {
   font-weight: 600;
   color: #111827;
   margin: 0;
+  text-align: left !important;
 }
 
 .cv-entry-sub {
@@ -196,12 +211,20 @@ body.nav-fixed, body {
   color: #4b5563;
   margin-top: 0.15rem;
   margin-bottom: 0;
+  text-align: left !important;
 }
 
 .cv-entry-date {
   font-size: 0.875rem;
   color: #6b7280;
   white-space: nowrap;
+  text-align: left !important;
+}
+
+@media (min-width: 768px) {
+  .cv-entry-date {
+    text-align: right !important;
+  }
 }
 
 @media (max-width: 640px) {
