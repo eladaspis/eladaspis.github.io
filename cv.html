@@ -134,85 +134,64 @@ ul.task-list li input[type="checkbox"] {
     
 <!-- main -->
 <div class="quarto-about-jolla"><main class="content" id="quarto-document-content">
-<script>
-  tailwind = {
-    config: {
-      corePlugins: {
-        preflight: false
-      },
-      theme: {
-        extend: {
-          colors: {
-            text: '#111827',
-            'text-body': '#4b5563',
-            'text-muted': '#6b7280',
-            'border-subtle': '#e5e7eb'
-          }
-        }
-      }
-    }
-  }
-</script>
-<script src="https://cdn.tailwindcss.com"></script>
-
 <div class="cv-container">
 <!-- Header -->
-<header class="flex flex-col md:flex-row print:flex-row md:items-center print:items-center gap-6 pb-6 border-b border-border-subtle">
-  <div class="flex-1 text-left">
-    <h1 class="font-display text-3xl md:text-4xl font-semibold text-text">Elad Aspis</h1>
-    <p class="text-text-body text-lg mt-1">Ph.D. Candidate | Senior AI Engineer</p>
+<div class="cv-header-block">
+  <div>
+    <h1 class="cv-title">Elad Aspis</h1>
+    <p class="cv-subtitle">Ph.D. Candidate | Senior AI Engineer</p>
   </div>
 
-  <div class="text-sm text-text-body space-y-1 md:text-right print:text-right">
+  <div class="cv-contact">
     <p>
-      <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21.128 12A10.01 10.01 10.01 0 0012 2a10 10 0 00-8.945 18.488M21.128 12a10.01 10.01 0 01-8.945 8.488"></path></svg>
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21.128 12A10.01 10.01 10.01 0 0012 2a10 10 0 00-8.945 18.488M21.128 12a10.01 10.01 0 01-8.945 8.488"></path></svg>
       eladaspis.github.io
     </p>
     <p>
-      <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+      <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
       eladaspis
     </p>
     <p>
-      <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"></path></svg>
+      <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"></path></svg>
       eladaspis
     </p>
     <p>
-      <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
       eladaspis@gmail.com
     </p>
   </div>
-</header>
+</div>
 
 <!-- Education -->
-<section class="mt-8">
-  <h2 class="font-display text-2xl font-semibold text-text mb-4">Education</h2>
+<section class="cv-section">
+  <h2 class="cv-section-title">Education</h2>
 
-  <div class="flex flex-col md:flex-row md:justify-between gap-1 mb-4">
-    <div class="flex-1 text-left">
-      <p class="font-semibold text-text">Ben Gurion University of the Negev</p>
-      <p class="text-text-body text-sm">Ph.D. candidate in Electrical and Computer Engineering, advised by Asst. Prof. Eliya Nachmani. Research on multi-agent turn-taking.</p>
+  <div class="cv-entry">
+    <div class="cv-entry-info">
+      <p class="cv-entry-heading">Ben Gurion University of the Negev</p>
+      <p class="cv-entry-sub">Ph.D. candidate in Electrical and Computer Engineering, advised by Asst. Prof. Eliya Nachmani. Research on multi-agent turn-taking.</p>
     </div>
-    <div class="text-text-muted text-sm md:text-right flex-shrink-0">
+    <div class="cv-entry-date">
       2026 – Present
     </div>
   </div>
 
-  <div class="flex flex-col md:flex-row md:justify-between gap-1 mb-4">
-    <div class="flex-1 text-left">
-      <p class="font-semibold text-text">Bar Ilan University</p>
-      <p class="text-text-body text-sm">M.Sc. in Electrical Engineering, advised by Prof. Sharon Gannot. Research on audio enhancement using diffusion models conditioned on MIDI representations.</p>
+  <div class="cv-entry">
+    <div class="cv-entry-info">
+      <p class="cv-entry-heading">Bar Ilan University</p>
+      <p class="cv-entry-sub">M.Sc. in Electrical Engineering, advised by Prof. Sharon Gannot. Research on audio enhancement using diffusion models conditioned on MIDI representations.</p>
     </div>
-    <div class="text-text-muted text-sm md:text-right flex-shrink-0">
+    <div class="cv-entry-date">
       2023 – 2026
     </div>
   </div>
 
-  <div class="flex flex-col md:flex-row md:justify-between gap-1 mb-4">
-    <div class="flex-1 text-left">
-      <p class="font-semibold text-text">Technion – Israel Institute of Technology</p>
-      <p class="text-text-body text-sm">B.Sc. in Computer Science and Mathematics. Dean's List 2020, 2022.</p>
+  <div class="cv-entry">
+    <div class="cv-entry-info">
+      <p class="cv-entry-heading">Technion – Israel Institute of Technology</p>
+      <p class="cv-entry-sub">B.Sc. in Computer Science and Mathematics. Dean's List 2020, 2022.</p>
     </div>
-    <div class="text-text-muted text-sm md:text-right flex-shrink-0">
+    <div class="cv-entry-date">
       2018 – 2022
     </div>
   </div>
@@ -220,15 +199,15 @@ ul.task-list li input[type="checkbox"] {
 </section>
 
 <!-- Employment -->
-<section class="mt-8">
-  <h2 class="font-display text-2xl font-semibold text-text mb-4">Work Experience</h2>
+<section class="cv-section">
+  <h2 class="cv-section-title">Work Experience</h2>
 
-  <div class="flex flex-col md:flex-row md:justify-between gap-1 mb-4">
-    <div class="flex-1 text-left">
-      <p class="font-semibold text-text">General Motors – Cyber Security Group</p>
-      <p class="text-text-body text-sm">Senior AI Engineer. Developed deep learning models for audio-based event detection, integrated LLMs to architect an autonomous AI agent with dynamic tool-calling capabilities, and built Python-based AI tools for firmware analysis and SBOM generation.</p>
+  <div class="cv-entry">
+    <div class="cv-entry-info">
+      <p class="cv-entry-heading">General Motors – Cyber Security Group</p>
+      <p class="cv-entry-sub">Senior AI Engineer. Developed deep learning models for audio-based event detection, integrated LLMs to architect an autonomous AI agent with dynamic tool-calling capabilities, and built Python-based AI tools for firmware analysis and SBOM generation.</p>
     </div>
-    <div class="text-text-muted text-sm md:text-right flex-shrink-0">
+    <div class="cv-entry-date">
       2021 – Present
     </div>
   </div>
