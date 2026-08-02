@@ -16,6 +16,28 @@ body {
   overflow-x: hidden;
 }
 
+/* Always Fixed Header Across All Pages */
+#quarto-header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 1030 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+body.nav-fixed, body {
+  padding-top: 60px !important;
+}
+
+@media (max-width: 991.98px) {
+  body.nav-fixed, body {
+    padding-top: 56px !important;
+  }
+}
+
 /* Container responsive padding for mobile & desktop */
 .quarto-container, #quarto-content {
   padding-left: 1rem !important;
