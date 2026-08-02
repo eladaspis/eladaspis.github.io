@@ -74,17 +74,18 @@ body.nav-fixed, body {
 /* Mobile navigation dropdown styling */
 @media (max-width: 991.98px) {
   .navbar-collapse {
-    background-color: #212529;
+    background-color: #ffffff;
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
     margin-top: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 
   .navbar-nav .nav-link {
     font-size: 1.1rem;
     padding: 0.65rem 0.5rem !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: #212529 !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .navbar-nav .nav-link:last-child {
