@@ -218,12 +218,6 @@ window.Quarto = { typesetMath };
 <section id="patching-the-audio-like-vit" class="level2">
 <h2 class="anchored" data-anchor-id="patching-the-audio-like-vit">2. Patching the Audio (Like ViT)</h2>
 <p>A Mel-Spectrogram is effectively a 2D single-channel image! We can borrow the core idea from the Vision Transformer (ViT). Instead of processing pixel by pixel, we divide the spectrogram into a grid of non-overlapping <strong>patches</strong>.</p>
-
-<figure style="text-align: center; margin: 2.5rem auto; max-width: 100%;">
-  <img src="assets/audio_spectrogram_patching.svg" alt="Audio Mel-Spectrogram Extraction &amp; Patch Embedding Pipeline" style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 0.5rem; background: white;">
-  <figcaption style="font-size: 0.85rem; color: #475569; margin-top: 0.75rem; line-height: 1.6; max-width: 90%; margin-left: auto; margin-right: auto;"><strong>Figure 1</strong> — Audio Spectrogram Transformer (AST) tokenization pipeline: 1D Waveform → STFT Spectrogram → 2D Patches → 1D Vector Projections.</figcaption>
-</figure>
-
 <p>Given a spectrogram <span class="math inline">\(S \in \mathbb{R}^{F \times T}\)</span>, we divide it into patches of size <span class="math inline">\(P_F \times P_T\)</span>. The total number of patches <span class="math inline">\(N\)</span> is:</p>
 <p><span class="math display">\[ N = \frac{F}{P_F} \times \frac{T}{P_T} \]</span></p>
 <p>Each patch is flattened into a 1D vector and passed through a linear layer (a linear projection) to create patch embeddings of dimension <span class="math inline">\(D\)</span>.</p>
@@ -286,12 +280,6 @@ window.Quarto = { typesetMath };
 </section>
 <section id="putting-it-all-together-the-audio-transformer" class="level2">
 <h2 class="anchored" data-anchor-id="putting-it-all-together-the-audio-transformer">5. Putting It All Together: The Audio Transformer</h2>
-
-<figure style="text-align: center; margin: 2.5rem auto; max-width: 100%;">
-  <img src="assets/audio_transformer_architecture.svg" alt="Audio Transformer Architecture Overview" style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 0.5rem; background: white;">
-  <figcaption style="font-size: 0.85rem; color: #475569; margin-top: 0.75rem; line-height: 1.6; max-width: 90%; margin-left: auto; margin-right: auto;"><strong>Figure 2</strong> — Complete end-to-end Audio Transformer dataflow from tokenized input patches to classification output.</figcaption>
-</figure>
-
 <p>Let’s stack the standard Transformer Encoder blocks on top of our embeddings. We will output the final representation of the <code>[CLS]</code> token to classify the audio (e.g., “Dog barking” vs “Car horn”).</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AudioTransformer(nn.Module):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_classes<span class="op">=</span><span class="dv">10</span>, embed_dim<span class="op">=</span><span class="dv">768</span>, depth<span class="op">=</span><span class="dv">12</span>, num_heads<span class="op">=</span><span class="dv">12</span>, num_patches<span class="op">=</span><span class="dv">80</span>):</span>
