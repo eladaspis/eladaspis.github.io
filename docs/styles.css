@@ -299,3 +299,9 @@ pre, code, table {
   max-width: 100%;
   overflow-x: auto;
 }
+
+/* Prevent fixed header from hiding the TOC */
+#TOC, #quarto-margin-sidebar, .margin-sidebar {
+  top: 90px !important;
+  margin-top: 2rem !important;
+}
