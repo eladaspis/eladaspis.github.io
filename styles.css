@@ -251,6 +251,30 @@ body.nav-fixed, body {
   }
 }
 
+.cv-skills-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  text-align: left !important;
+}
+
+.cv-skill-item {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #374151;
+  text-align: left !important;
+}
+
+.cv-skill-category {
+  font-weight: 600;
+  color: #111827;
+  margin-right: 0.35rem;
+}
+
+.cv-skill-list {
+  color: #4b5563;
+}
+
 @media (max-width: 640px) {
   .cv-container {
     padding: 1rem 0.5rem;
