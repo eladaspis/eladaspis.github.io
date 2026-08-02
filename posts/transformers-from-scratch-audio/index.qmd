@@ -13,7 +13,7 @@ In this post, we will build a Transformer for audio from scratch. We'll cover th
 
 ---
 
-## 1. How Do We Feed Audio to a Transformer?
+## How Do We Feed Audio to a Transformer?
 
 Unlike text, which is naturally discrete (words/tokens), audio is a continuous 1D signal (a waveform). While some models (like Wav2Vec 2.0) process raw waveforms directly, it is often much more efficient to convert the audio into a 2D representation: the **Mel-Spectrogram**.
 
@@ -30,7 +30,7 @@ We then map these frequencies to the **Mel scale**, which mimics human hearing (
 
 ---
 
-## 2. Patching the Audio (Like ViT)
+## Patching the Audio (Like ViT)
 
 A Mel-Spectrogram is effectively a 2D single-channel image! We can borrow the core idea from the Vision Transformer (ViT). Instead of processing pixel by pixel, we divide the spectrogram into a grid of non-overlapping **patches**.
 
@@ -64,7 +64,7 @@ class AudioPatchEmbedding(nn.Module):
 
 ---
 
-## 3. Positional Encoding
+## Positional Encoding
 
 Unlike RNNs or CNNs, Transformers have no built-in sense of order or position. Since an audio clip has a strict temporal and frequency structure, we must inject positional information into our patch embeddings.
 
@@ -100,7 +100,7 @@ class AudioTransformerEmbedding(nn.Module):
 
 ---
 
-## 4. The Self-Attention Mechanism
+## The Self-Attention Mechanism
 
 This is the heart of the Transformer architecture. For every patch (token), the model computes a Query ($Q$), Key ($K$), and Value ($V$). 
 
@@ -112,7 +112,7 @@ For example, a patch containing a sharp transient (like a drum hit) might attend
 
 ---
 
-## 5. Putting It All Together: The Audio Transformer
+## Putting It All Together: The Audio Transformer
 
 Let's stack the standard Transformer Encoder blocks on top of our embeddings. We will output the final representation of the `[CLS]` token to classify the audio (e.g., "Dog barking" vs "Car horn").
 

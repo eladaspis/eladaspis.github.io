@@ -3,7 +3,6 @@ title: "Building Transformers for Audio from Scratch: Code, Math, and Theory"
 author: "Elad Aspis"
 date: "2026-08-02"
 categories: [audio, machine-learning, transformers, pytorch, deep-learning, audio-transformers]
-image: "assets/audio_spectrogram_patching.svg"
 description: "A complete step-by-step guide to building an Audio Transformer from scratch in PyTorch. Learn how Mel-Spectrograms are converted into 2D patches, sinusoidal and learnable positional encodings, and self-attention for audio processing."
 toc: true
 ---
@@ -14,7 +13,7 @@ In this post, we will build a Transformer for audio from scratch. We'll cover th
 
 ---
 
-## 1. How Do We Feed Audio to a Transformer?
+## How Do We Feed Audio to a Transformer?
 
 Unlike text, which is naturally discrete (words/tokens), audio is a continuous 1D signal (a waveform). While some models (like Wav2Vec 2.0) process raw waveforms directly, it is often much more efficient to convert the audio into a 2D representation: the **Mel-Spectrogram**.
 
@@ -31,14 +30,9 @@ We then map these frequencies to the **Mel scale**, which mimics human hearing (
 
 ---
 
-## 2. Patching the Audio (Like ViT)
+## Patching the Audio (Like ViT)
 
 A Mel-Spectrogram is effectively a 2D single-channel image! We can borrow the core idea from the Vision Transformer (ViT). Instead of processing pixel by pixel, we divide the spectrogram into a grid of non-overlapping **patches**.
-
-<figure style="text-align: center; margin: 2.5rem auto; max-width: 100%;">
-  <img src="assets/audio_spectrogram_patching.svg" alt="Audio Mel-Spectrogram Extraction & Patch Embedding Pipeline" style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 0.5rem; background: white;" />
-  <figcaption style="font-size: 0.85rem; color: #475569; margin-top: 0.75rem; line-height: 1.6; max-width: 90%; margin-left: auto; margin-right: auto;"><strong>Figure 1</strong> — Audio Spectrogram Transformer (AST) tokenization pipeline: 1D Waveform → STFT Spectrogram → 2D Patches → 1D Vector Projections.</figcaption>
-</figure>
 
 Given a spectrogram $S \in \mathbb{R}^{F \times T}$, we divide it into patches of size $P_F \times P_T$. 
 The total number of patches $N$ is:
@@ -70,7 +64,7 @@ class AudioPatchEmbedding(nn.Module):
 
 ---
 
-## 3. Positional Encoding
+## Positional Encoding
 
 Unlike RNNs or CNNs, Transformers have no built-in sense of order or position. Since an audio clip has a strict temporal and frequency structure, we must inject positional information into our patch embeddings.
 
@@ -106,7 +100,7 @@ class AudioTransformerEmbedding(nn.Module):
 
 ---
 
-## 4. The Self-Attention Mechanism
+## The Self-Attention Mechanism
 
 This is the heart of the Transformer architecture. For every patch (token), the model computes a Query ($Q$), Key ($K$), and Value ($V$). 
 
@@ -118,12 +112,7 @@ For example, a patch containing a sharp transient (like a drum hit) might attend
 
 ---
 
-## 5. Putting It All Together: The Audio Transformer
-
-<figure style="text-align: center; margin: 2.5rem auto; max-width: 100%;">
-  <img src="assets/audio_transformer_architecture.svg" alt="Audio Transformer Architecture Overview" style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 0.5rem; background: white;" />
-  <figcaption style="font-size: 0.85rem; color: #475569; margin-top: 0.75rem; line-height: 1.6; max-width: 90%; margin-left: auto; margin-right: auto;"><strong>Figure 2</strong> — Complete end-to-end Audio Transformer dataflow from tokenized input patches to classification output.</figcaption>
-</figure>
+## Putting It All Together: The Audio Transformer
 
 Let's stack the standard Transformer Encoder blocks on top of our embeddings. We will output the final representation of the `[CLS]` token to classify the audio (e.g., "Dog barking" vs "Car horn").
 

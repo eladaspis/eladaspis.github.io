@@ -184,11 +184,11 @@ window.Quarto = { typesetMath };
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#how-do-we-feed-audio-to-a-transformer" id="toc-how-do-we-feed-audio-to-a-transformer" class="nav-link active" data-scroll-target="#how-do-we-feed-audio-to-a-transformer">1. How Do We Feed Audio to a Transformer?</a></li>
-  <li><a href="#patching-the-audio-like-vit" id="toc-patching-the-audio-like-vit" class="nav-link" data-scroll-target="#patching-the-audio-like-vit">2. Patching the Audio (Like ViT)</a></li>
-  <li><a href="#positional-encoding" id="toc-positional-encoding" class="nav-link" data-scroll-target="#positional-encoding">3. Positional Encoding</a></li>
-  <li><a href="#the-self-attention-mechanism" id="toc-the-self-attention-mechanism" class="nav-link" data-scroll-target="#the-self-attention-mechanism">4. The Self-Attention Mechanism</a></li>
-  <li><a href="#putting-it-all-together-the-audio-transformer" id="toc-putting-it-all-together-the-audio-transformer" class="nav-link" data-scroll-target="#putting-it-all-together-the-audio-transformer">5. Putting It All Together: The Audio Transformer</a></li>
+  <li><a href="#how-do-we-feed-audio-to-a-transformer" id="toc-how-do-we-feed-audio-to-a-transformer" class="nav-link active" data-scroll-target="#how-do-we-feed-audio-to-a-transformer">How Do We Feed Audio to a Transformer?</a></li>
+  <li><a href="#patching-the-audio-like-vit" id="toc-patching-the-audio-like-vit" class="nav-link" data-scroll-target="#patching-the-audio-like-vit">Patching the Audio (Like ViT)</a></li>
+  <li><a href="#positional-encoding" id="toc-positional-encoding" class="nav-link" data-scroll-target="#positional-encoding">Positional Encoding</a></li>
+  <li><a href="#the-self-attention-mechanism" id="toc-the-self-attention-mechanism" class="nav-link" data-scroll-target="#the-self-attention-mechanism">The Self-Attention Mechanism</a></li>
+  <li><a href="#putting-it-all-together-the-audio-transformer" id="toc-putting-it-all-together-the-audio-transformer" class="nav-link" data-scroll-target="#putting-it-all-together-the-audio-transformer">Putting It All Together: The Audio Transformer</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
@@ -200,7 +200,7 @@ window.Quarto = { typesetMath };
 <p>In this post, we will build a Transformer for audio from scratch. We’ll cover the core mathematics, the intuition behind processing sound waves, and implement the complete architecture in PyTorch.</p>
 <hr>
 <section id="how-do-we-feed-audio-to-a-transformer" class="level2">
-<h2 class="anchored" data-anchor-id="how-do-we-feed-audio-to-a-transformer">1. How Do We Feed Audio to a Transformer?</h2>
+<h2 class="anchored" data-anchor-id="how-do-we-feed-audio-to-a-transformer">How Do We Feed Audio to a Transformer?</h2>
 <p>Unlike text, which is naturally discrete (words/tokens), audio is a continuous 1D signal (a waveform). While some models (like Wav2Vec 2.0) process raw waveforms directly, it is often much more efficient to convert the audio into a 2D representation: the <strong>Mel-Spectrogram</strong>.</p>
 <section id="the-math-short-time-fourier-transform-stft" class="level3">
 <h3 class="anchored" data-anchor-id="the-math-short-time-fourier-transform-stft">The Math: Short-Time Fourier Transform (STFT)</h3>
@@ -216,7 +216,7 @@ window.Quarto = { typesetMath };
 </section>
 </section>
 <section id="patching-the-audio-like-vit" class="level2">
-<h2 class="anchored" data-anchor-id="patching-the-audio-like-vit">2. Patching the Audio (Like ViT)</h2>
+<h2 class="anchored" data-anchor-id="patching-the-audio-like-vit">Patching the Audio (Like ViT)</h2>
 <p>A Mel-Spectrogram is effectively a 2D single-channel image! We can borrow the core idea from the Vision Transformer (ViT). Instead of processing pixel by pixel, we divide the spectrogram into a grid of non-overlapping <strong>patches</strong>.</p>
 <p>Given a spectrogram <span class="math inline">\(S \in \mathbb{R}^{F \times T}\)</span>, we divide it into patches of size <span class="math inline">\(P_F \times P_T\)</span>. The total number of patches <span class="math inline">\(N\)</span> is:</p>
 <p><span class="math display">\[ N = \frac{F}{P_F} \times \frac{T}{P_T} \]</span></p>
@@ -243,7 +243,7 @@ window.Quarto = { typesetMath };
 </section>
 </section>
 <section id="positional-encoding" class="level2">
-<h2 class="anchored" data-anchor-id="positional-encoding">3. Positional Encoding</h2>
+<h2 class="anchored" data-anchor-id="positional-encoding">Positional Encoding</h2>
 <p>Unlike RNNs or CNNs, Transformers have no built-in sense of order or position. Since an audio clip has a strict temporal and frequency structure, we must inject positional information into our patch embeddings.</p>
 <p>The classic sinusoidal positional encoding is defined as:</p>
 <p><span class="math display">\[ PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right) \]</span> <span class="math display">\[ PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right) \]</span></p>
@@ -271,7 +271,7 @@ window.Quarto = { typesetMath };
 <hr>
 </section>
 <section id="the-self-attention-mechanism" class="level2">
-<h2 class="anchored" data-anchor-id="the-self-attention-mechanism">4. The Self-Attention Mechanism</h2>
+<h2 class="anchored" data-anchor-id="the-self-attention-mechanism">The Self-Attention Mechanism</h2>
 <p>This is the heart of the Transformer architecture. For every patch (token), the model computes a Query (<span class="math inline">\(Q\)</span>), Key (<span class="math inline">\(K\)</span>), and Value (<span class="math inline">\(V\)</span>).</p>
 <p>The Scaled Dot-Product Attention computes how much focus a given audio patch should place on every other patch in the spectrogram:</p>
 <p><span class="math display">\[ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V \]</span></p>
@@ -279,7 +279,7 @@ window.Quarto = { typesetMath };
 <hr>
 </section>
 <section id="putting-it-all-together-the-audio-transformer" class="level2">
-<h2 class="anchored" data-anchor-id="putting-it-all-together-the-audio-transformer">5. Putting It All Together: The Audio Transformer</h2>
+<h2 class="anchored" data-anchor-id="putting-it-all-together-the-audio-transformer">Putting It All Together: The Audio Transformer</h2>
 <p>Let’s stack the standard Transformer Encoder blocks on top of our embeddings. We will output the final representation of the <code>[CLS]</code> token to classify the audio (e.g., “Dog barking” vs “Car horn”).</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> AudioTransformer(nn.Module):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, num_classes<span class="op">=</span><span class="dv">10</span>, embed_dim<span class="op">=</span><span class="dv">768</span>, depth<span class="op">=</span><span class="dv">12</span>, num_heads<span class="op">=</span><span class="dv">12</span>, num_patches<span class="op">=</span><span class="dv">80</span>):</span>
