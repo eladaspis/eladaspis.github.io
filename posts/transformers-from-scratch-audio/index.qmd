@@ -3,6 +3,7 @@ title: "Building Transformers for Audio from Scratch: Code, Math, and Theory"
 author: "Elad Aspis"
 date: "2026-08-02"
 categories: [audio, machine-learning, transformers, pytorch, deep-learning, audio-transformers]
+image: "assets/cover.png"
 description: "A complete step-by-step guide to building an Audio Transformer from scratch in PyTorch. Learn how Mel-Spectrograms are converted into 2D patches, sinusoidal and learnable positional encodings, and self-attention for audio processing."
 toc: true
 ---
