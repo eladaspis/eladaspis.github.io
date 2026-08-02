@@ -1,3 +1,0 @@
-- url: /blog/2026/07/20/audio-encoders-from-vqvae-to-modern/
-  title: "Vector Quantized VAEs (VQ-VAE): Math & PyTorch Implementation"
-  description: "A technical deep-dive on the evolution of neural audio encoders, from VQ-VAE through SoundStream, EnCodec, and AudioLM — with architecture diagrams and mathematical formulations."

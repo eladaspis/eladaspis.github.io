@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 390" font-family="'Inter', 'Source Sans 3', system-ui, sans-serif">
+  <defs>
+    <linearGradient id="rawGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.04"/>
+    </linearGradient>
+    <linearGradient id="codecGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.18"/>
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.05"/>
+    </linearGradient>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#ef4444"/>
+    </marker>
+    <marker id="arrowGreen2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#10b981"/>
+    </marker>
+    <marker id="arrowBigDown" markerWidth="10" markerHeight="10" refX="5" refY="10" orient="auto">
+      <path d="M0,0 L5,10 L10,0 Z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="940" height="390" rx="12" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="30" y="38" font-size="16" font-weight="700" fill="#1e293b">Raw Waveform Autoregression vs. Neural Codec Bottleneck</text>
+
+  <!-- BOX 1: RAW WAVEFORM GENERATION -->
+  <g transform="translate(30, 55)">
+    <rect width="880" height="105" rx="10" fill="url(#rawGrad)" stroke="#fca5a5" stroke-width="1.5"/>
+    <text x="20" y="28" font-size="13" font-weight="700" fill="#b91c1c">RAW WAVEFORM GENERATION (Sample-by-Sample)</text>
+    <text x="20" y="46" font-size="11" fill="#991b1b">High time-resolution (44,100 samples/sec). Extremely high sampling latency.</text>
+
+    <!-- Samples Sequence -->
+    <g transform="translate(20, 60)" font-size="11" font-weight="600" fill="#7f1d1d">
+      <rect x="0" y="0" width="55" height="26" rx="4" fill="#fee2e2" stroke="#f87171" stroke-width="1"/>
+      <text x="27.5" y="17" text-anchor="middle">0.02</text>
+
+      <line x1="58" y1="13" x2="72" y2="13" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+      <rect x="75" y="0" width="55" height="26" rx="4" fill="#fee2e2" stroke="#f87171" stroke-width="1"/>
+      <text x="102.5" y="17" text-anchor="middle">0.05</text>
+
+      <line x1="133" y1="13" x2="147" y2="13" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+      <rect x="150" y="0" width="55" height="26" rx="4" fill="#fee2e2" stroke="#f87171" stroke-width="1"/>
+      <text x="177.5" y="17" text-anchor="middle">0.03</text>
+
+      <line x1="208" y1="13" x2="222" y2="13" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+
+      <text x="245" y="17" font-size="14" fill="#b91c1c">. . . . . .</text>
+
+      <rect x="300" y="0" width="65" height="26" rx="4" fill="#fee2e2" stroke="#f87171" stroke-width="1"/>
+      <text x="332.5" y="17" text-anchor="middle">0.12</text>
+
+      <text x="385" y="17" font-size="11" font-weight="700" fill="#991b1b">(Requires 44,100 forward passes per second of audio!)</text>
+    </g>
+  </g>
+
+  <!-- MIDDLE PARADIGM SHIFT ARROW (PROMINENT & HIGH CONTRAST) -->
+  <g transform="translate(470, 160)">
+    <!-- Top vertical line from Box 1 -->
+    <line x1="0" y1="0" x2="0" y2="20" stroke="#2563eb" stroke-width="2.5"/>
+
+    <!-- Paradigm Shift Badge -->
+    <rect x="-165" y="20" width="330" height="28" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="0" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">⚡ Modern Paradigm Shift: Neural Audio Codec Encoder</text>
+
+    <!-- Bottom vertical line pointing to Box 2 with large arrow head -->
+    <line x1="0" y1="48" x2="0" y2="82" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrowBigDown)"/>
+  </g>
+
+  <!-- BOX 2: NEURAL CODEC COMPRESSION -->
+  <g transform="translate(30, 255)">
+    <rect width="880" height="115" rx="10" fill="url(#codecGrad)" stroke="#6ee7b7" stroke-width="1.5"/>
+    <text x="20" y="28" font-size="13" font-weight="700" fill="#047857">NEURAL CODEC COMPRESSION (Frame-by-Frame Bottleneck)</text>
+    <text x="20" y="46" font-size="11" fill="#065f46">Compressed frame rate (50 Hz). Low sequence length suitable for standard Transformer LMs.</text>
+
+    <!-- Codec Frames -->
+    <g transform="translate(20, 60)" font-size="11" font-weight="600" fill="#064e3b">
+      <!-- Frame 1 -->
+      <g transform="translate(0, 0)">
+        <rect x="0" y="0" width="135" height="40" rx="6" fill="#d1fae5" stroke="#34d399" stroke-width="1.5"/>
+        <text x="67.5" y="17" text-anchor="middle" font-weight="700" fill="#047857">Frame 1 (20ms)</text>
+        <text x="67.5" y="31" text-anchor="middle" font-size="9" fill="#065f46">RVQ Tokens [k₁,₁, ..., k₁,₈]</text>
+      </g>
+
+      <line x1="140" y1="20" x2="160" y2="20" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowGreen2)"/>
+
+      <!-- Frame 2 -->
+      <g transform="translate(165, 0)">
+        <rect x="0" y="0" width="135" height="40" rx="6" fill="#d1fae5" stroke="#34d399" stroke-width="1.5"/>
+        <text x="67.5" y="17" text-anchor="middle" font-weight="700" fill="#047857">Frame 2 (20ms)</text>
+        <text x="67.5" y="31" text-anchor="middle" font-size="9" fill="#065f46">RVQ Tokens [k₂,₁, ..., k₂,₈]</text>
+      </g>
+
+      <line x1="305" y1="20" x2="325" y2="20" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowGreen2)"/>
+
+      <!-- Frame 3 -->
+      <g transform="translate(330, 0)">
+        <rect x="0" y="0" width="135" height="40" rx="6" fill="#d1fae5" stroke="#34d399" stroke-width="1.5"/>
+        <text x="67.5" y="17" text-anchor="middle" font-weight="700" fill="#047857">Frame 3 (20ms)</text>
+        <text x="67.5" y="31" text-anchor="middle" font-size="9" fill="#065f46">RVQ Tokens [k₃,₁, ..., k₃,₈]</text>
+      </g>
+
+      <text x="485" y="24" font-size="14" fill="#047857">. . . . . .</text>
+
+      <text x="550" y="24" font-size="11" font-weight="700" fill="#047857">(Only 50 forward passes per second of audio!)</text>
+    </g>
+  </g>
+</svg>

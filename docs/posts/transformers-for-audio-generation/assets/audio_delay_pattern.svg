@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 380" font-family="'Inter', 'Source Sans 3', system-ui, sans-serif">
+  <defs>
+    <!-- Card & Grid gradients -->
+    <linearGradient id="cb1Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.1"/>
+    </linearGradient>
+    <linearGradient id="cb2Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.1"/>
+    </linearGradient>
+    <linearGradient id="cb3Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0.1"/>
+    </linearGradient>
+    <linearGradient id="cb4Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.1"/>
+    </linearGradient>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Background container -->
+  <rect width="940" height="380" rx="12" fill="#ffffff"/>
+
+  <!-- Title & Subtitle -->
+  <text x="30" y="38" font-size="16" font-weight="700" fill="#1e293b">MusicGen Codebook Delay Pattern (Interleaved RVQ Streams)</text>
+  <text x="30" y="58" font-size="12" fill="#64748b">Each RVQ codebook m is delayed by m-1 timesteps, allowing a single AR Transformer to model cross-codebook dependencies.</text>
+
+  <!-- Time Header Axis -->
+  <g transform="translate(180, 85)">
+    <text x="40" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">t = 1</text>
+    <text x="130" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">t = 2</text>
+    <text x="220" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">t = 3</text>
+    <text x="310" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">t = 4</text>
+    <text x="400" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">t = 5</text>
+    <text x="490" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">t = 6</text>
+    <text x="580" y="0" text-anchor="middle" font-size="12" font-weight="600" fill="#64748b">t = 7</text>
+    <line x1="0" y1="12" x2="630" y2="12" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- Codebook Labels -->
+  <g font-size="13" font-weight="600">
+    <text x="30" y="132" fill="#1d4ed8">Codebook 1 (Coarse)</text>
+    <text x="30" y="187" fill="#047857">Codebook 2</text>
+    <text x="30" y="242" fill="#b45309">Codebook 3</text>
+    <text x="30" y="297" fill="#6d28d9">Codebook 4 (Fine)</text>
+  </g>
+
+  <!-- GRID CELLS -->
+  <!-- Codebook 1 (Shift 0) -->
+  <g transform="translate(180, 105)">
+    <rect x="0" y="0" width="80" height="42" rx="6" fill="url(#cb1Grad)" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="40" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">c₁,₁</text>
+
+    <rect x="90" y="0" width="80" height="42" rx="6" fill="url(#cb1Grad)" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="130" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">c₁,₂</text>
+
+    <rect x="180" y="0" width="80" height="42" rx="6" fill="url(#cb1Grad)" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="220" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">c₁,₃</text>
+
+    <rect x="270" y="0" width="80" height="42" rx="6" fill="url(#cb1Grad)" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="310" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">c₁,₄</text>
+
+    <rect x="360" y="0" width="80" height="42" rx="6" fill="url(#cb1Grad)" stroke="#2563eb" stroke-width="1.5"/>
+    <text x="400" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">c₁,₅</text>
+  </g>
+
+  <!-- Codebook 2 (Shift 1) -->
+  <g transform="translate(180, 160)">
+    <rect x="0" y="0" width="80" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="40" y="26" text-anchor="middle" font-size="11" fill="#94a3b8">PAD</text>
+
+    <rect x="90" y="0" width="80" height="42" rx="6" fill="url(#cb2Grad)" stroke="#059669" stroke-width="1.5"/>
+    <text x="130" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">c₂,₁</text>
+
+    <rect x="180" y="0" width="80" height="42" rx="6" fill="url(#cb2Grad)" stroke="#059669" stroke-width="1.5"/>
+    <text x="220" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">c₂,₂</text>
+
+    <rect x="270" y="0" width="80" height="42" rx="6" fill="url(#cb2Grad)" stroke="#059669" stroke-width="1.5"/>
+    <text x="310" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">c₂,₃</text>
+
+    <rect x="360" y="0" width="80" height="42" rx="6" fill="url(#cb2Grad)" stroke="#059669" stroke-width="1.5"/>
+    <text x="400" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">c₂,₄</text>
+  </g>
+
+  <!-- Codebook 3 (Shift 2) -->
+  <g transform="translate(180, 215)">
+    <rect x="0" y="0" width="80" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="40" y="26" text-anchor="middle" font-size="11" fill="#94a3b8">PAD</text>
+
+    <rect x="90" y="0" width="80" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="130" y="26" text-anchor="middle" font-size="11" fill="#94a3b8">PAD</text>
+
+    <rect x="180" y="0" width="80" height="42" rx="6" fill="url(#cb3Grad)" stroke="#d97706" stroke-width="1.5"/>
+    <text x="220" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">c₃,₁</text>
+
+    <rect x="270" y="0" width="80" height="42" rx="6" fill="url(#cb3Grad)" stroke="#d97706" stroke-width="1.5"/>
+    <text x="310" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">c₃,₂</text>
+
+    <rect x="360" y="0" width="80" height="42" rx="6" fill="url(#cb3Grad)" stroke="#d97706" stroke-width="1.5"/>
+    <text x="400" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">c₃,₃</text>
+  </g>
+
+  <!-- Codebook 4 (Shift 3) -->
+  <g transform="translate(180, 270)">
+    <rect x="0" y="0" width="80" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="40" y="26" text-anchor="middle" font-size="11" fill="#94a3b8">PAD</text>
+
+    <rect x="90" y="0" width="80" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="130" y="26" text-anchor="middle" font-size="11" fill="#94a3b8">PAD</text>
+
+    <rect x="180" y="0" width="80" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="220" y="26" text-anchor="middle" font-size="11" fill="#94a3b8">PAD</text>
+
+    <rect x="270" y="0" width="80" height="42" rx="6" fill="url(#cb4Grad)" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="310" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#5b21b6">c₄,₁</text>
+
+    <rect x="360" y="0" width="80" height="42" rx="6" fill="url(#cb4Grad)" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="400" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#5b21b6">c₄,₂</text>
+  </g>
+
+  <!-- Dependency Highlight Line -->
+  <path d="M 220, 147 L 290, 180" fill="none" stroke="#2563eb" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#arrowBlue)"/>
+  <rect x="225" y="145" width="125" height="20" rx="4" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="287" y="159" text-anchor="middle" font-size="9" font-weight="600" fill="#1e40af">Conditioned Dependency</text>
+
+  <!-- Bottom Legend -->
+  <rect x="30" y="330" width="880" height="35" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="470" y="352" text-anchor="middle" font-size="11" fill="#475569">
+    <tspan font-weight="700" fill="#1e293b">Key Insight:</tspan> At timestep t=2, token c₂,₁ is generated with direct causal attention to coarse token c₁,₁ generated at t=1.
+  </text>
+</svg>

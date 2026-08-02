@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 320" font-family="'Inter', 'Source Sans 3', system-ui, sans-serif">
+  <defs>
+    <linearGradient id="topGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.06"/>
+    </linearGradient>
+    <linearGradient id="midGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.06"/>
+    </linearGradient>
+    <linearGradient id="botGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.06"/>
+    </linearGradient>
+    <marker id="arrowPurpDown" markerWidth="8" markerHeight="8" refX="4" refY="8" orient="auto">
+      <path d="M0,0 L4,8 L8,0 Z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrowBlueDown" markerWidth="8" markerHeight="8" refX="4" refY="8" orient="auto">
+      <path d="M0,0 L4,8 L8,0 Z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="940" height="320" rx="12" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="30" y="38" font-size="16" font-weight="700" fill="#1e293b">Jukebox Hierarchical Upsampling Cascade</text>
+
+  <!-- TOP-LEVEL LM -->
+  <g transform="translate(30, 55)">
+    <rect width="880" height="52" rx="8" fill="url(#topGrad)" stroke="#c4b5fd" stroke-width="1.5"/>
+    <text x="20" y="30" font-size="13" font-weight="700" fill="#6d28d9">Top-Level LM (128x Downsampling)</text>
+    <text x="360" y="30" font-size="11" fill="#5b21b6">Models global long-range musical keys, genre style, and lyrics</text>
+  </g>
+
+  <!-- PROMINENT ARROW 1: Top -> Mid -->
+  <g transform="translate(470, 107)">
+    <line x1="0" y1="0" x2="0" y2="35" stroke="#7c3aed" stroke-width="2.5" marker-end="url(#arrowPurpDown)"/>
+    <rect x="-85" y="6" width="170" height="20" rx="4" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1"/>
+    <text x="0" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#6d28d9">Conditioned Upsampling ↓</text>
+  </g>
+
+  <!-- MIDDLE-LEVEL LM -->
+  <g transform="translate(30, 145)">
+    <rect width="880" height="52" rx="8" fill="url(#midGrad)" stroke="#93c5fd" stroke-width="1.5"/>
+    <text x="20" y="30" font-size="13" font-weight="700" fill="#1e40af">Middle-Level LM (32x Downsampling)</text>
+    <text x="360" y="30" font-size="11" fill="#1d4ed8">Generates musical chords, instrumental motifs, and local timing</text>
+  </g>
+
+  <!-- PROMINENT ARROW 2: Mid -> Bot -->
+  <g transform="translate(470, 197)">
+    <line x1="0" y1="0" x2="0" y2="35" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrowBlueDown)"/>
+    <rect x="-85" y="6" width="170" height="20" rx="4" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+    <text x="0" y="20" text-anchor="middle" font-size="10" font-weight="700" fill="#1d4ed8">Conditioned Upsampling ↓</text>
+  </g>
+
+  <!-- BOTTOM-LEVEL LM -->
+  <g transform="translate(30, 235)">
+    <rect width="880" height="52" rx="8" fill="url(#botGrad)" stroke="#67e8f9" stroke-width="1.5"/>
+    <text x="20" y="30" font-size="13" font-weight="700" fill="#0e7490">Bottom-Level LM (8x Downsampling)</text>
+    <text x="360" y="30" font-size="11" fill="#155e75">Generates high-frequency waveform details, timbre, and acoustic noise</text>
+  </g>
+</svg>

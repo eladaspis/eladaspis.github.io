@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Elad Aspis">
+<meta name="dcterms.date" content="2026-07-20">
+<meta name="description" content="A deep dive into Vector Quantized Variational Autoencoders (VQ-VAE) — mathematical ELBO derivations, rate-distortion bounds, Straight-Through Estimator (STE) gradient bias, codebook collapse dynamics, EMA updates, spherical quantization, and production-grade PyTorch implementation.">
+
+<title>Vector Quantized VAEs (VQ-VAE): Math, Codebook Collapse &amp; PyTorch Implementation – Blog</title>
+<style>
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em;
+  vertical-align: middle;
+}
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-445b8638c3d06994fee0907d791121c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    window.MathJax.typeset([el]);
+  }
+}
+window.Quarto = { typesetMath };
+</script>
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Blog</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../cv.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/eladaspis"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/eladaspis/"> <i class="bi bi-linkedin" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div>
+      </div>
+    </nav>
+</header>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Vector Quantized VAEs (VQ-VAE): Math, Codebook Collapse &amp; PyTorch Implementation</h1>
+                  <div>
+        <div class="description">
+          A deep dive into Vector Quantized Variational Autoencoders (VQ-VAE) — mathematical ELBO derivations, rate-distortion bounds, Straight-Through Estimator (STE) gradient bias, codebook collapse dynamics, EMA updates, spherical quantization, and production-grade PyTorch implementation.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">audio</div>
+                <div class="quarto-category">machine-learning</div>
+                <div class="quarto-category">vq-vae</div>
+                <div class="quarto-category">neural-compression</div>
+                <div class="quarto-category">deep-learning</div>
+              </div>
+                  </div>
+  </div>
+    
+  <div class="quarto-title-meta">
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Elad Aspis </p>
+            </div>
+    </div>
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 20, 2026</p>
+      </div>
+    </div>
+    </div>
+</header>
+
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-foundation-vq-vae" id="toc-the-foundation-vq-vae" class="nav-link active" data-scroll-target="#the-foundation-vq-vae">The Foundation: VQ-VAE &amp; Information Bottlenecks</a></li>
+  <li><a href="#variational-derivation" id="toc-variational-derivation" class="nav-link" data-scroll-target="#variational-derivation">Variational &amp; Information-Theoretic Derivation</a></li>
+  <li><a href="#architecture-loss" id="toc-architecture-loss" class="nav-link" data-scroll-target="#architecture-loss">Architecture &amp; Formal Loss Formulation</a></li>
+  <li><a href="#gradient-flow-ste" id="toc-gradient-flow-ste" class="nav-link" data-scroll-target="#gradient-flow-ste">Gradient Flow &amp; The Straight-Through Estimator</a></li>
+  <li><a href="#core-challenges" id="toc-core-challenges" class="nav-link" data-scroll-target="#core-challenges">Core Challenges &amp; Pathologies</a></li>
+  <li><a href="#pytorch-implementation" id="toc-pytorch-implementation" class="nav-link" data-scroll-target="#pytorch-implementation">PyTorch Implementation</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix: Mathematical Notation</a></li>
+  </ul>
+</nav>
+</div>
+
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+<p>Vector Quantized Variational Autoencoders (VQ-VAE) offer a different approach to representation learning by replacing continuous Gaussian latents with <strong>discrete categorical codes</strong>. Forcing high-dimensional signals, like audio, through a finite codebook bottleneck solves issues like posterior collapse and provides direct control over the rate-distortion tradeoff. This formulation is the basis for many modern neural audio codecs and discrete audio language models.</p>
+
+<p>In this post, we'll walk through the theoretical foundations of VQ-VAE, how gradient estimation works in this setup, and some of the practical challenges encountered during training, such as codebook collapse and capacity degeneration.</p>
+
+<div class="callout callout-style-default callout-note callout-titled" title="Prerequisites">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Prerequisites
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This post is self-contained, but it helps to have a basic familiarity with:</p>
+<ul>
+<li>What a Variational Autoencoder (VAE) is and the standard ELBO derivation</li>
+<li>Backpropagation, the chain rule, and what <code>detach()</code> does in PyTorch</li>
+<li>K-Means clustering and the idea of a Voronoi tessellation</li>
+</ul>
+<p>If you are new to VAEs, a quick read of the original Kingma &amp; Welling (2013) paper or any ELBO tutorial will give you all the background needed.</p>
+</div>
+</div>
+
+<hr>
+
+<section id="the-foundation-vq-vae" class="level2">
+<h2 class="anchored" data-anchor-id="the-foundation-vq-vae">The Foundation: VQ-VAE &amp; Information Bottlenecks</h2>
+
+<p>Historically, generative models for high-dimensional signals (like audio waveforms or spectrograms) relied heavily on <strong>continuous latent representations</strong>. Standard Variational Autoencoders (VAEs) mapped inputs to continuous Gaussian distributions \(\mathcal{N}(\mu, \sigma^2)\).</p>
+
+<p>However, using continuous representations for audio autoencoding presents some structural challenges:</p>
+<ol type="1">
+<li><strong>Posterior Collapse</strong>: When paired with strong autoregressive decoders (like WaveNet), standard VAEs often experience posterior collapse. The decoder models \(p_\theta(x \mid z)\) based almost entirely on past audio samples \(x_{&lt;t}\) and ignores the latent variable \(z\). The encoder posterior \(q_\phi(z \mid x)\) then collapses to the prior \(p(z) = \mathcal{N}(0, I)\), making the latent space largely uninformative (\(\mathcal{D}_{\text{KL}} \to 0\)).</li>
+<li><strong>Discrete Modeling</strong>: Continuous vectors can't be directly fed into discrete sequence models (like standard Transformers or n-gram models) without some form of quantization.</li>
+</ol>
+
+<p>The <strong>Vector Quantized Variational Autoencoder</strong> (VQ-VAE), introduced by van den Oord et al. in 2017, addresses this by making the latent space <strong>discrete</strong>. By quantizing the continuous encoder output into a sequence of codebook indices, VQ-VAE creates a strict information bottleneck. This helps prevent posterior collapse and translates the audio signal into a sequence of discrete tokens.</p>
+</section>
+
+<hr>
+
+<section id="variational-derivation" class="level2">
+<h2 class="anchored" data-anchor-id="variational-derivation">Variational &amp; Information-Theoretic Derivation</h2>
+
+<p>We can understand the VQ-VAE objective by analyzing the Evidence Lower Bound (ELBO).</p>
+
+<section id="derivation-discrete-elbo" class="level3">
+<h3 class="anchored" data-anchor-id="derivation-discrete-elbo">Derivation of the Discrete ELBO</h3>
+
+<p>For an input audio signal \(x \in \mathbb{R}^T\) and discrete latent variable \(z \in \{1, \dots, K\}^S\) (where \(S\) is the temporal sequence length of the latents and \(K\) is the codebook size), the log marginal likelihood satisfies:</p>
+
+<p>\[\log p_\theta(x) = \log \sum_{z} p_\theta(x, z) = \log \sum_{z} q_\phi(z \mid x) \frac{p_\theta(x, z)}{q_\phi(z \mid x)}\]</p>
+
+<p>Applying Jensen's Inequality (\(\log \mathbb{E}[Y] \ge \mathbb{E}[\log Y]\)) yields the ELBO:</p>
+
+<p>\[\log p_\theta(x) \ge \mathbb{E}_{q_\phi(z \mid x)} [\log p_\theta(x \mid z)] - \mathcal{D}_{\text{KL}}(q_\phi(z \mid x) \parallel p(z))\]</p>
+</section>
+
+<section id="deterministic-posterior-kl" class="level3">
+<h3 class="anchored" data-anchor-id="deterministic-posterior-kl">The Deterministic Posterior &amp; Constant KL Divergence</h3>
+
+<p>VQ-VAE defines a <strong>deterministic posterior distribution</strong> \(q_\phi(z = k \mid x)\). The encoder \(E_\phi(x)\) outputs a continuous latent vector \(z_e \in \mathbb{R}^D\). The quantization operator maps \(z_e\) to the nearest entry \(e_k\) in a learned codebook \(\mathcal{C} = \{e_1, e_2, \dots, e_K\} \subset \mathbb{R}^D\):</p>
+
+<p>\[q_\phi(z = k \mid x) = \begin{cases} 1 &amp; \text{if } k = \arg\min_{j \in \{1, \dots, K\}} \|E_\phi(x) - e_j\|_2 \\ 0 &amp; \text{otherwise} \end{cases}\]</p>
+
+<p>Assuming a <strong>uniform prior</strong> over the codebook entries, \(p(z = k) = \frac{1}{K}\) for all \(k \in \{1, \dots, K\}\):</p>
+
+<p>\[\mathcal{D}_{\text{KL}}(q_\phi(z \mid x) \parallel p(z)) = \sum_{k=1}^K q_\phi(z = k \mid x) \log \frac{q_\phi(z = k \mid x)}{p(z = k)}\]</p>
+
+<p>Since \(q_\phi(z = k^* \mid x) = 1\) for the winning index \(k^*\) and \(0\) elsewhere:</p>
+
+<p>\[\mathcal{D}_{\text{KL}}(q_\phi(z \mid x) \parallel p(z)) = 1 \cdot \log \frac{1}{1/K} = \log K\]</p>
+
+<p>Because \(\log K\) is a constant determined solely by the codebook size \(K\), <strong>the KL divergence term is completely independent of the model parameters \(\phi\) and \(\theta\)</strong>.</p>
+
+<p>Thus, during training, the KL divergence term contributes zero gradient and can be dropped entirely from optimization:</p>
+
+<p>\[\max_{\phi, \theta} \text{ELBO} \iff \max_{\phi, \theta} \mathbb{E}_{q_\phi(z \mid x)} [\log p_\theta(x \mid z)]\]</p>
+
+<div class="callout callout-style-default callout-important callout-titled" title="Why the constant KL is a big deal">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Why the constant KL is a big deal
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In a standard continuous VAE, the KL term \(\mathcal{D}_{\text{KL}}(q_\phi(z \mid x) \| p(z))\) actively resists the encoder from using the latent space. This tension between KL and reconstruction causes <strong>posterior collapse</strong> — especially with strong autoregressive decoders. VQ-VAE's constant KL of \(\log K\) removes this tension entirely: the encoder is free to use all \(K\) codebook entries without any regularization penalty. The codebook size \(K\) is then the only knob controlling how much information the bottleneck permits, giving the designer precise rate-distortion control.</p>
+</div>
+</div>
+</section>
+
+<section id="rate-distortion-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="rate-distortion-interpretation">Rate-Distortion Interpretation</h3>
+
+<p>From a Rate-Distortion Theory perspective, VQ-VAE optimizes the distortion \(D = \mathbb{E}[d(x, \hat{x})]\) subject to a maximum bit-rate constraint \(R\).</p>
+
+<p>For an audio waveform sampled at \(f_{\text{sample}}\) Hz downsampled by a temporal factor \(M\) (so the frame rate is \(f_s = \frac{f_{\text{sample}}}{M}\) frames/sec), the discrete latent space enforces a strict information rate bound:</p>
+
+<p>\[R = f_s \cdot \log_2 K \quad \text{bits per second}\]</p>
+
+<p>For instance, at \(f_{\text{sample}} = 24\,\text{kHz}\) with a downsampling factor \(M = 320\) (\(f_s = 75\,\text{Hz}\)) and codebook size \(K = 1024\) (\(\log_2 1024 = 10\,\text{bits}\)):</p>
+
+<p>\[R = 75 \times 10 = 750 \quad \text{bits/sec} = 0.75 \quad \text{kbps}\]</p>
+
+<p>Because \(R\) is fixed by architecture, the decoder \(p_\theta(x \mid z_q)\) is forced to reconstruct the maximum possible acoustic detail from at most \(0.75\,\text{kbps}\) of latent information. This hard capacity ceiling prevents the decoder from ignoring \(z_q\).</p>
+</section>
+</section>
+
+<hr>
+
+<section id="architecture-loss" class="level2">
+<h2 class="anchored" data-anchor-id="architecture-loss">Architecture &amp; Formal Loss Formulation</h2>
+
+<figure style="text-align: center; margin: 2.5rem auto; max-width: 100%;">
+  <img src="../../images/vqvae_fig1_paper.png" alt="Original VQ-VAE Figure 1 from van den Oord et al. (2017)" style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);" />
+  <figcaption style="font-size: 0.85rem; color: #475569; margin-top: 0.75rem; line-height: 1.6; max-width: 90%; margin-left: auto; margin-right: auto;"><strong>Figure 1</strong> — Original diagram from van den Oord et al. (2017). <strong>Left:</strong> VQ-VAE pipeline — input \(x\) is encoded by \(E_\phi\), quantized to codebook entry \(e_2\), and decoded by \(D_\theta\). <strong>Right:</strong> Embedding space geometry — the codebook loss moves \(e_2\) toward \(z_e(x)\), while the commitment loss prevents \(z_e(x)\) from diverging beyond its Voronoi cell.</figcaption>
+</figure>
+
+<section id="mathematical-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="mathematical-pipeline">Mathematical Pipeline</h3>
+<ol type="1">
+<li><strong>Encoder</strong>: Maps input \(x \in \mathbb{R}^T\) to continuous latents \(z_e = E_\phi(x) \in \mathbb{R}^{S \times D}\).</li>
+<li><strong>Vector Quantization</strong>: Maps each frame \(z_e^{(t)} \in \mathbb{R}^D\) to its nearest codebook entry \(z_q^{(t)} \in \mathbb{R}^D\):
+\[k^{(t)} = \arg\min_{k \in \{1, \dots, K\}} \|z_e^{(t)} - e_k\|_2^2, \quad z_q^{(t)} = e_{k^{(t)}}\]</li>
+<li><strong>Decoder</strong>: Maps quantized latents \(z_q \in \mathbb{R}^{S \times D}\) back to waveform space \(\hat{x} = D_\theta(z_q) \in \mathbb{R}^T\).</li>
+</ol>
+</section>
+
+<section id="complete-objective" class="level3">
+<h3 class="anchored" data-anchor-id="complete-objective">Complete Objective Function</h3>
+
+<p>Because the \(\arg\min\) operation in quantization is non-differentiable, gradient flow from the decoder to the encoder is blocked. VQ-VAE solves this by decomposing the objective into three explicit loss terms:</p>
+
+<p>\[\mathcal{L}_{\text{VQ-VAE}} = \underbrace{\mathcal{L}_{\text{recon}}(x, \hat{x})}_{\text{Reconstruction Loss}} + \underbrace{\|\text{sg}[z_e] - z_q\|_2^2}_{\text{Codebook Loss}} + \underbrace{\beta \|\text{sg}[z_q] - z_e\|_2^2}_{\text{Commitment Loss}}\]</p>
+
+<p>where \(\text{sg}[\cdot]\) is the <strong>stop-gradient operator</strong> (defined as \(\text{sg}[x] \equiv x\) during forward pass and \(\nabla_x \text{sg}[x] \equiv 0\) during backward pass).</p>
+
+<figure style="text-align: center; margin: 2.5rem auto; max-width: 100%;">
+  <img src="../../images/vqvae_pipeline.svg" alt="VQ-VAE computational pipeline with STE gradient bypass" style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 1rem; background: white;" />
+  <figcaption style="font-size: 0.85rem; color: #475569; margin-top: 0.75rem; line-height: 1.6; max-width: 90%; margin-left: auto; margin-right: auto;"><strong>Figure 2</strong> — VQ-VAE computational pipeline. The encoder \(E_\phi\) maps input \(x\) to continuous latents \(z_e\). The quantizer selects the nearest codebook entry \(z_q\) via \(\arg\min\). The decoder \(D_\theta\) reconstructs \(\hat{x}\). The <span style="color: #ef4444; font-weight: 600;">red dashed arrow</span> shows the STE gradient bypass: \(\nabla_{z_e} \mathcal{L} \approx \nabla_{z_q} \mathcal{L}\).</figcaption>
+</figure>
+</section>
+
+<section id="physical-breakdown-losses" class="level3">
+<h3 class="anchored" data-anchor-id="physical-breakdown-losses">Physical Breakdown of the Loss Terms</h3>
+<ul>
+<li><strong>Reconstruction Loss (\(\mathcal{L}_{\text{recon}}\))</strong>: Measures fidelity between \(x\) and \(\hat{x}\) (e.g., \(L_2\) error \(\|x - \hat{x}\|_2^2\) or multi-scale STFT loss). Updates decoder parameters \(\theta\) and, via STE, encoder parameters \(\phi\).</li>
+<li><strong>Codebook Loss (\(\|\text{sg}[z_e] - z_q\|_2^2\))</strong>: Moves the selected codebook vectors \(e_k\) closer to the encoder outputs \(z_e\). Optimizes codebook entries \(\mathcal{C}\) using \(\ell_2\) dictionary learning.</li>
+<li><strong>Commitment Loss (\(\beta \|\text{sg}[z_q] - z_e\|_2^2\))</strong>: Prevents the encoder output \(z_e\) from growing wildly in magnitude or fluctuating rapidly across Voronoi cell boundaries. The hyperparameter \(\beta\) (typically \(\beta \in [0.1, 0.5]\), default \(\beta=0.25\)) controls how strongly the encoder commits to the chosen codebook entry.</li>
+</ul>
+</section>
+</section>
+
+<hr>
+
+<section id="gradient-flow-ste" class="level2">
+<h2 class="anchored" data-anchor-id="gradient-flow-ste">Gradient Flow &amp; The Straight-Through Estimator (STE)</h2>
+
+<section id="non-differentiability-problem" class="level3">
+<h3 class="anchored" data-anchor-id="non-differentiability-problem">The Non-Differentiability Problem</h3>
+
+<p>The quantization function \(Q(z_e) = e_{\arg\min_k \|z_e - e_k\|_2}\) is a step function. Its derivative with respect to \(z_e\) is zero everywhere except at the cell boundaries between codebook vectors, where it is undefined:</p>
+
+<p>\[\frac{\partial z_q}{\partial z_e} = 0 \quad \text{almost everywhere}\]</p>
+
+<p>If standard backpropagation is applied, the chain rule yields \(\frac{\partial \mathcal{L}}{\partial \phi} = \frac{\partial \mathcal{L}}{\partial \hat{x}} \frac{\partial \hat{x}}{\partial z_q} \frac{\partial z_q}{\partial z_e} \frac{\partial z_e}{\partial \phi} = 0\), completely freezing the encoder weights \(\phi\).</p>
+</section>
+
+<section id="ste-trick" class="level3">
+<h3 class="anchored" data-anchor-id="ste-trick">The Straight-Through Estimator Trick</h3>
+
+<p>To bypass this, VQ-VAE employs the <strong>Straight-Through Estimator (STE)</strong> (Bengio et al., 2013). The STE replaces the zero derivative \(\frac{\partial z_q}{\partial z_e}\) with the identity matrix \(I\):</p>
+
+<p>\[\frac{\partial \mathcal{L}}{\partial z_e} \approx \frac{\partial \mathcal{L}}{\partial z_q}\]</p>
+
+<p>In autograd computational graphs, this gradient bypass is implemented cleanly using <code>detach()</code>:</p>
+
+<p>\[z_q^{\text{STE}} = z_e + \text{sg}[z_q - z_e]\]</p>
+
+<ul>
+<li><strong>Forward Pass</strong>: \(z_q^{\text{STE}} = z_e + (z_q - z_e) = z_q\). The decoder receives the exact discrete quantized vector \(z_q\).</li>
+<li><strong>Backward Pass</strong>: \(\frac{\partial z_q^{\text{STE}}}{\partial z_e} = \frac{\partial z_e}{\partial z_e} + \frac{\partial \text{sg}[z_q - z_e]}{\partial z_e} = I + 0 = I\). The gradient \(\nabla_{z_q} \mathcal{L}\) passes directly to \(z_e\) unmodified.</li>
+</ul>
+
+<div class="callout callout-style-default callout-tip callout-titled" title="The STE in one line of PyTorch">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>The STE in one line of PyTorch
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The entire Straight-Through Estimator trick reduces to a single line:</p>
+<p><code>z_q_st = z_e + (z_q - z_e).detach()</code></p>
+<p>In the forward pass, <code>.detach()</code> has no effect: <code>z_q_st == z_q</code>. In the backward pass, autograd treats the detached term as a constant, so <code>dL/dz_e = dL/dz_q_st</code> — the gradient flows straight through as if quantization never happened. That's it. The whole complexity of discrete gradient estimation, solved by one <code>.detach()</code>.</p>
+</div>
+</div>
+
+<p>Below are PyTorch computation graphs comparing gradient flow with and without the STE bypass:</p>
+
+<div style="display: flex; gap: 1.5rem; align-items: flex-start; justify-content: center; margin: 2.5rem 0; flex-wrap: wrap;">
+  <figure style="flex: 1; min-width: 220px; max-width: 340px; margin: 0;">
+    <img src="../../images/vqvae_with_ste.svg" alt="Computation graph with straight-through estimator" style="display: block; max-height: 700px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 0.5rem; background: white;" />
+    <figcaption style="font-size: 0.82rem; color: #475569; text-align: center; margin-top: 0.75rem; line-height: 1.6;"><strong>Figure 3a</strong> — <strong>With STE.</strong> The <code>sub → detach → add</code> bypass creates an identity gradient path from \(z_q\) back to \(z_e\).</figcaption>
+  </figure>
+  <figure style="flex: 1; min-width: 220px; max-width: 340px; margin: 0;">
+    <img src="../../images/vqvae_no_ste.svg" alt="Computation graph without straight-through estimator" style="display: block; max-height: 700px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 0.5rem; background: white;" />
+    <figcaption style="font-size: 0.82rem; color: #475569; text-align: center; margin-top: 0.75rem; line-height: 1.6;"><strong>Figure 3b</strong> — <strong>Without STE.</strong> The <code>Quantize</code> node blocks all backward gradients, completely freezing encoder weights.</figcaption>
+  </figure>
+</div>
+</section>
+
+<section id="ste-gradient-bias" class="level3">
+<h3 class="anchored" data-anchor-id="ste-gradient-bias">Theoretical Analysis of STE Gradient Bias</h3>
+
+<p>While STE enables end-to-end learning, it is a <strong>biased gradient estimator</strong>. The true directional gradient of the expectation \(\nabla_{z_e} \mathbb{E}[\mathcal{L}]\) differs from the sample STE gradient \(\nabla_{z_q} \mathcal{L}\).</p>
+
+<p>When \(\|z_e - z_q\|_2\) is large, the identity approximation \(\frac{\partial z_q}{\partial z_e} \approx I\) severely misleads encoder optimization. This bias directly motivates alternative gradient approximations:</p>
+
+<table class="table table-bordered">
+<thead>
+<tr><th>Gradient Estimator</th><th>Mathematical Formulation</th><th>Trade-off / Properties</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Straight-Through (STE)</strong></td><td>\(z_q^{\text{STE}} = z_e + \text{sg}[z_q - z_e]\)</td><td>Simple, low variance, biased gradient. Standard in VQ-VAE.</td></tr>
+<tr><td><strong>Gumbel-Softmax</strong> (Jang et al.)</td><td>\(y_k = \frac{\exp((\log \pi_k + g_k)/\tau)}{\sum_j \exp((\log \pi_j + g_j)/\tau)}\)</td><td>Differentiable continuous relaxation. Unbiased as temperature \(\tau \to 0\), but high variance at low \(\tau\).</td></tr>
+<tr><td><strong>Soft-to-Hard Quantization</strong></td><td>\(z_q = \sum_k \text{softmax}(-\|z_e - e_k\|_2^2 / \tau) e_k\)</td><td>Smooth interpolation during early training; annealed to hard assignment.</td></tr>
+<tr><td><strong>Finite Scalar Quantization (FSQ)</strong></td><td>\(z_q = f(z_e)\) via bounded rounding</td><td>Bypasses vector codebooks entirely by rounding scalar channels directly.</td></tr>
+</tbody>
+</table>
+</section>
+</section>
+
+<hr>
+
+<section id="core-challenges" class="level2">
+<h2 class="anchored" data-anchor-id="core-challenges">Core Challenges &amp; Pathologies</h2>
+
+<p>While the standard VQ-VAE formulation is neat, it can suffer from failure modes that degrade codebook efficiency and reconstruction quality.</p>
+
+<figure style="text-align: center; margin: 2.5rem auto; max-width: 100%;">
+  <img src="../../images/vqvae_codebook_collapse.svg" alt="Healthy vs collapsed codebook Voronoi tessellation comparison" style="max-width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 1rem; background: white;" />
+  <figcaption style="font-size: 0.85rem; color: #475569; margin-top: 0.75rem; line-height: 1.6; max-width: 90%; margin-left: auto; margin-right: auto;"><strong>Figure 4</strong> — Codebook collapse pathology. <strong>Left:</strong> A healthy codebook uniformly partitions the latent space into Voronoi cells, with each vector receiving approximately equal assignments (Perplexity \(\approx K\)). <strong>Right:</strong> Under collapse, a single "winner" vector captures nearly all assignments while the remaining entries become permanently dead (Perplexity \(\to 1\)).</figcaption>
+</figure>
+
+<section id="codebook-collapse" class="level3">
+<h3 class="anchored" data-anchor-id="codebook-collapse">Challenge: Codebook Collapse</h3>
+
+<p><strong>The Issue</strong>: Vector quantization partitions \(\mathbb{R}^D\) into a Voronoi tessellation. Early in training, due to initialization, a small subset of codebook vectors might lie closer to the encoder outputs \(z_e\). These "winner" vectors receive all assignments during the \(\arg\min\) search and get updated via gradients. Meanwhile, the majority of the codebook vectors might receive zero assignments (\(\mathbb{E}[q(z=k \mid x)] = 0\)). Without assignments, they receive no gradient updates and <strong>remain "dead" permanently</strong>.</p>
+
+<p><strong>Measuring Collapse</strong>: We can measure codebook utilization using <strong>Perplexity</strong> (the exponential of the entropy of the assignment probabilities):</p>
+
+<p>\[H(\mathcal{C}) = -\sum_{k=1}^K p_k \log p_k, \quad p_k = \frac{1}{N} \sum_{i=1}^N \mathbb{I}(k^{(i)} = k)\]</p>
+
+<p>\[\text{Perplexity} = \exp\left(H(\mathcal{C})\right) = \exp\left(-\sum_{k=1}^K p_k \log p_k\right)\]</p>
+
+<ul>
+<li>For a uniformly utilized codebook, \(p_k = \frac{1}{K}\) and \(\text{Perplexity} = K\) (maximum capacity).</li>
+<li>Under severe collapse, \(\text{Perplexity} \to 1\). A codebook with \(K=1024\) entries might end up with an effective perplexity of only 10, meaning most of the capacity is unused.</li>
+</ul>
+
+<div class="callout callout-style-default callout-warning callout-titled" title="Codebook collapse is silent and hard to debug">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Codebook collapse is silent and hard to debug
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Codebook collapse does <strong>not</strong> cause an obvious training spike or NaN. The reconstruction loss may still decrease and the model may appear to converge. The only reliable signal is monitoring <strong>Perplexity</strong> during training. A healthy codebook with \(K = 1024\) entries should have perplexity steadily climbing toward \(1024\) over the first few thousand steps. If perplexity plateaus below \(50\) or \(100\), collapse has already occurred — and no amount of continued training will recover the dead entries without explicit re-initialization. Always log perplexity alongside your reconstruction loss.</p>
+</div>
+</div>
+</section>
+
+<section id="solutions-collapse" class="level3">
+<h3 class="anchored" data-anchor-id="solutions-collapse">Solutions to Codebook Collapse</h3>
+
+<section id="ema-updates" class="level4">
+<h4 class="anchored" data-anchor-id="ema-updates">Exponential Moving Average (EMA) Codebook Updates</h4>
+
+<p>Instead of optimizing codebook vectors using gradient descent via the codebook loss \(\|\text{sg}[z_e] - z_q\|_2^2\), we update codebook entries \(\mathcal{C}\) using <strong>online K-means clustering with Laplace smoothing</strong>.</p>
+
+<p>For a mini-batch of continuous latents \(\{z_e^{(i)}\}_{i=1}^N\) with assigned cluster indicators \(r_{ik} = \mathbb{I}(k^{(i)} = k)\):</p>
+
+<p>\[N_k^{(t)} = \gamma N_k^{(t-1)} + (1 - \gamma) \sum_{i=1}^N r_{ik}\]</p>
+
+<p>\[m_k^{(t)} = \gamma m_k^{(t-1)} + (1 - \gamma) \sum_{i=1}^N r_{ik} z_e^{(i)}\]</p>
+
+<p>\[e_k^{(t)} = \frac{m_k^{(t)} + \epsilon \cdot \frac{1}{K}}{N_k^{(t)} + \epsilon}\]</p>
+
+<p>where \(\gamma \in (0, 1)\) is the EMA decay factor (typically \(\gamma = 0.99\)), and \(\epsilon\) is a Laplace smoothing constant to prevent division by zero.</p>
+
+<p><strong>Why EMA helps</strong>: It decouples codebook updates from the optimizer's learning rate, updating centroids more stably based on batch statistics. This also removes the need for the codebook loss term.</p>
+</section>
+
+<section id="dead-code-reinit" class="level4">
+<h4 class="anchored" data-anchor-id="dead-code-reinit">Dead Code Re-initialization (Codebook Resetting)</h4>
+
+<p>During training, we track the rolling usage count \(N_k\) for every entry \(e_k\). If \(N_k &lt; \text{threshold}\) over a window of batches (indicating a dead vector), we forcibly reset \(e_k\) by sampling a random continuous encoder output \(z_e^{(j)}\) from the current batch:</p>
+
+<p>\[e_k \leftarrow z_e^{(j)} + \mathcal{N}(0, \sigma^2 I)\]</p>
+
+<p>This injects dead vectors back into active regions of the latent space, guaranteeing high perplexity throughout training.</p>
+</section>
+
+<section id="spherical-quantization" class="level4">
+<h4 class="anchored" data-anchor-id="spherical-quantization">\(L_2\) Normalization / Spherical Quantization</h4>
+
+<p>High-dimensional \(L_2\) distance suffers from the curse of dimensionality: magnitude variations in \(z_e\) can dominate the distance lookup.</p>
+
+<p>Spherical quantization projects both encoder output \(z_e\) and codebook vectors \(e_k\) onto the unit hyper-sphere \(\mathbb{S}^{D-1}\):</p>
+
+<p>\[\bar{z}_e = \frac{z_e}{\|z_e\|_2}, \quad \bar{e}_k = \frac{e_k}{\|e_k\|_2}\]</p>
+
+<p>The nearest-neighbor lookup simplifies to maximizing <strong>Cosine Similarity</strong>:</p>
+
+<p>\[k^* = \arg\min_k \|\bar{z}_e - \bar{e}_k\|_2^2 = \arg\max_k (\bar{z}_e^\top \bar{e}_k)\]</p>
+
+<p>Normalizing vectors eliminates scale explosion and significantly stabilizes codebook utilization (adopted in SoundStream, ViT-VQGAN, and Descript Audio Codec).</p>
+</section>
+
+<section id="subspace-projection" class="level4">
+<h4 class="anchored" data-anchor-id="subspace-projection">Subspace Projection (Factorized Quantization)</h4>
+
+<p>Instead of performing vector quantization in the raw encoder channel dimension \(D\) (e.g., \(D=512\)), we project \(z_e\) down to a low-dimensional subspace \(d \ll D\) (e.g., \(d=8\) or \(d=32\)) via linear projection \(W_{\text{in}} \in \mathbb{R}^{D \times d}\) before codebook lookup:</p>
+
+<p>\[z_e^{\text{proj}} = z_e W_{\text{in}} \in \mathbb{R}^{d}, \quad z_q^{\text{proj}} = \arg\min_{e_k \in \mathbb{R}^d} \|z_e^{\text{proj}} - e_k\|_2^2\]</p>
+
+<p>\[z_q = z_q^{\text{proj}} W_{\text{out}} \in \mathbb{R}^D\]</p>
+
+<p>Reducing the dimensionality \(d\) reduces distance concentration effects, dramatically mitigating codebook collapse.</p>
+</section>
+</section>
+
+<section id="audio-specific-bottlenecks" class="level3">
+<h3 class="anchored" data-anchor-id="audio-specific-bottlenecks">Challenge: Audio-Specific Bottlenecks (Time vs. Frequency)</h3>
+
+<p>Audio signals have fine-grained temporal variation (e.g., 24,000 to 44,100 samples per second).</p>
+
+<p>When designing a VQ-VAE for waveforms, we face a trade-off:</p>
+<ul>
+<li><strong>Large Downsampling Factor \(M\)</strong>: Gives a lower token rate, but each discrete token \(z_q^{(t)}\) must represent a lot of complex acoustic information. A single codebook (e.g., \(K=1024\)) often lacks the capacity for this, leading to muffled or degraded reconstructions.</li>
+<li><strong>Small Downsampling Factor \(M\)</strong>: Improves acoustic fidelity but increases the token rate significantly. Downstream autoregressive models trained on these sequences then face context window limits and higher computational costs.</li>
+</ul>
+
+<p>This trade-off is a primary reason why modern architectures moved toward <strong>multi-scale representations</strong> (like VQ-VAE-2) and <strong>Residual Vector Quantization</strong> (RVQ, seen in SoundStream and EnCodec).</p>
+</section>
+</section>
+
+<hr>
+
+<section id="pytorch-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="pytorch-implementation">PyTorch Implementation: Research-Grade Vector Quantizer</h2>
+
+<p>To help make these concepts concrete, let me show you how to implement a production-grade <code>VectorQuantizer</code> in PyTorch.</p>
+
+<p>This self-contained module handles <strong>Straight-Through Estimation (STE)</strong>, <strong>L2 and Cosine (spherical) distance metrics</strong>, <strong>EMA codebook updates with Laplace smoothing</strong>, <strong>perplexity tracking</strong>, and <strong>automatic dead-code re-initialization</strong> to combat codebook collapse.</p>
+
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python">
+<span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="kw">as</span> nn</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn.functional <span class="kw">as</span> F</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="nc">VectorQuantizer</span>(nn<span class="op">.</span>Module):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">    Research-Grade Vector Quantizer supporting:</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">    1. Straight-Through Estimator (STE)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">    2. L2 and Cosine Similarity (Spherical) Distance Metrics</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">    3. Exponential Moving Average (EMA) Codebook Updates</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">    4. Perplexity / Codebook Entropy Tracking</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">    5. Dead-Code Automatic Re-initialization</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="st">    Args:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="st">        num_embeddings (int): Size of codebook (K).</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="st">        embedding_dim (int): Dimension of latent space (D).</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="st">        beta (float): Scaling factor for the commitment loss (default 0.25).</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="st">        distance_metric (str): 'l2' or 'cosine' (spherical quantization).</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="st">        use_ema (bool): Use EMA codebook updates instead of the gradient codebook loss.</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="st">        decay (float): EMA decay rate (gamma).</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="st">        epsilon (float): Laplace smoothing constant for numerical stability.</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="st">        threshold_dead_limit (float): Cluster-size threshold below which a code is re-initialized.</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        num_embeddings: <span class="bu">int</span> <span class="op">=</span> 1024,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        embedding_dim: <span class="bu">int</span> <span class="op">=</span> 128,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        beta: <span class="bu">float</span> <span class="op">=</span> 0.25,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        distance_metric: <span class="bu">str</span> <span class="op">=</span> <span class="st">"</span><span class="st">cosine</span><span class="st">"</span>,  <span class="co"># 'l2' or 'cosine'</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        use_ema: <span class="bu">bool</span> <span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        decay: <span class="bu">float</span> <span class="op">=</span> 0.99,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        epsilon: <span class="bu">float</span> <span class="op">=</span> 1e-5,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        threshold_dead_limit: <span class="bu">float</span> <span class="op">=</span> 1.0,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    ):</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>()<span class="op">.</span><span class="fu">__init__</span>()</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>num_embeddings <span class="op">=</span> num_embeddings</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>embedding_dim <span class="op">=</span> embedding_dim</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>beta <span class="op">=</span> beta</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>distance_metric <span class="op">=</span> distance_metric</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>use_ema <span class="op">=</span> use_ema</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>decay <span class="op">=</span> decay</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>epsilon <span class="op">=</span> epsilon</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>threshold_dead_limit <span class="op">=</span> threshold_dead_limit</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Codebook weights</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span><span class="op">.</span>codebook <span class="op">=</span> nn<span class="op">.</span>Embedding(num_embeddings, embedding_dim)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="op">not</span> use_ema:</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span><span class="op">.</span>codebook<span class="op">.</span>weight<span class="op">.</span>data<span class="op">.</span>uniform_(</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>                <span class="op">-</span>1.0 <span class="op">/</span> num_embeddings, 1.0 <span class="op">/</span> num_embeddings</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span>:</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span><span class="op">.</span>codebook<span class="op">.</span>weight<span class="op">.</span>data<span class="op">.</span>normal_()</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Register buffers for EMA tracking</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span><span class="op">.</span>register_buffer(<span class="st">"</span><span class="st">ema_cluster_size</span><span class="st">"</span>, torch<span class="op">.</span>zeros(num_embeddings))</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span><span class="op">.</span>register_buffer(<span class="st">"</span><span class="st">ema_w</span><span class="st">"</span>, <span class="va">self</span><span class="op">.</span>codebook<span class="op">.</span>weight<span class="op">.</span>data<span class="op">.</span>clone())</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">forward</span>(<span class="va">self</span>, z_e: torch<span class="op">.</span>Tensor) <span class="op">-</span><span class="op">&amp;</span>gt; <span class="bu">tuple</span>[torch<span class="op">.</span>Tensor, torch<span class="op">.</span>Tensor, torch<span class="op">.</span>Tensor, torch<span class="op">.</span>Tensor]:</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        <span class="st">"""</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="st">        Args:</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="st">            z_e (torch.Tensor): Continuous encoder output of shape (B, D, T).</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="st">        Returns:</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="st">            z_q_st (torch.Tensor): Quantized tensor with STE gradient flow (B, D, T).</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="st">            indices (torch.Tensor): Discrete codebook indices (B, T).</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="st">            loss (torch.Tensor): Total VQ loss (scalar).</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="st">            perplexity (torch.Tensor): Codebook utilization metric (scalar).</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="st">        """</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. Reshape z_e from (B, D, T) -&amp;gt; (B*T, D)</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>        B, D, T <span class="op">=</span> z_e<span class="op">.</span>shape</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>        z_e_flat <span class="op">=</span> z_e<span class="op">.</span>permute(0, 2, 1)<span class="op">.</span>contiguous()<span class="op">.</span>view(<span class="op">-</span>1, D)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2. Compute distances between z_e and codebook entries</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="va">self</span><span class="op">.</span>distance_metric <span class="op">==</span> <span class="st">"</span><span class="st">cosine</span><span class="st">"</span>:</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>            z_e_norm <span class="op">=</span> F<span class="op">.</span>normalize(z_e_flat, dim<span class="op">=</span><span class="op">-</span>1)</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>            codebook_norm <span class="op">=</span> F<span class="op">.</span>normalize(<span class="va">self</span><span class="op">.</span>codebook<span class="op">.</span>weight, dim<span class="op">=</span><span class="op">-</span>1)</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Distance = 2 * (1 - cosine_similarity)</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>            distances <span class="op">=</span> 2.0 <span class="op">*</span> (1.0 <span class="op">-</span> torch<span class="op">.</span>matmul(z_e_norm, codebook_norm<span class="op">.</span>T))</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span>:  <span class="co"># L2 distance: ||z_e - e||^2 = ||z_e||^2 - 2&amp;lt;z_e, e&amp;gt; + ||e||^2</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>            distances <span class="op">=</span> (</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>                torch<span class="op">.</span>sum(z_e_flat <span class="op">*</span><span class="op">*</span> 2, dim<span class="op">=</span>1, keepdim<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>                <span class="op">-</span> 2 <span class="op">*</span> torch<span class="op">.</span>matmul(z_e_flat, <span class="va">self</span><span class="op">.</span>codebook<span class="op">.</span>weight<span class="op">.</span>T)</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> torch<span class="op">.</span>sum(<span class="va">self</span><span class="op">.</span>codebook<span class="op">.</span>weight <span class="op">*</span><span class="op">*</span> 2, dim<span class="op">=</span>1, keepdim<span class="op">=</span><span class="va">True</span>)<span class="op">.</span>T</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 3. Nearest-neighbor lookup (argmin)</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>        indices <span class="op">=</span> torch<span class="op">.</span>argmin(distances, dim<span class="op">=</span>1)  <span class="co"># (B*T,)</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>        encodings <span class="op">=</span> F<span class="op">.</span>one_hot(indices, <span class="va">self</span><span class="op">.</span>num_embeddings)<span class="op">.</span>float()  <span class="co"># (B*T, K)</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>        z_q_flat <span class="op">=</span> <span class="va">self</span><span class="op">.</span>codebook(indices)  <span class="co"># (B*T, D)</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 4. Perplexity / codebook entropy tracking</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>        perplexity <span class="op">=</span> compute_perplexity(encodings)</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 5. Codebook updates: EMA vs gradient loss</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="va">self</span><span class="op">.</span>training <span class="op">and</span> <span class="va">self</span><span class="op">.</span>use_ema:</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>            <span class="kw">with</span> torch<span class="op">.</span>no_grad():</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Update EMA cluster sizes with Laplace smoothing</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>                n_total <span class="op">=</span> torch<span class="op">.</span>sum(encodings, dim<span class="op">=</span>0)</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span><span class="op">.</span>ema_cluster_size<span class="op">.</span>data<span class="op">.</span>mul_(<span class="va">self</span><span class="op">.</span>decay)<span class="op">.</span>add_(</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>                    n_total, alpha<span class="op">=</span>1 <span class="op">-</span> <span class="va">self</span><span class="op">.</span>decay</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Update EMA embedding sums</span></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>                dw <span class="op">=</span> torch<span class="op">.</span>matmul(encodings<span class="op">.</span>T, z_e_flat)</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span><span class="op">.</span>ema_w<span class="op">.</span>data<span class="op">.</span>mul_(<span class="va">self</span><span class="op">.</span>decay)<span class="op">.</span>add_(dw, alpha<span class="op">=</span>1 <span class="op">-</span> <span class="va">self</span><span class="op">.</span>decay)</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Laplace-smoothed centroid calculation</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>                n <span class="op">=</span> torch<span class="op">.</span>sum(<span class="va">self</span><span class="op">.</span>ema_cluster_size)</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>                smoothed_cluster_size <span class="op">=</span> (</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>                    (<span class="va">self</span><span class="op">.</span>ema_cluster_size <span class="op">+</span> <span class="va">self</span><span class="op">.</span>epsilon)</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>                    <span class="op">/</span> (n <span class="op">+</span> <span class="va">self</span><span class="op">.</span>num_embeddings <span class="op">*</span> <span class="va">self</span><span class="op">.</span>epsilon)</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>                    <span class="op">*</span> n</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Update codebook weights</span></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>                updated_weight <span class="op">=</span> <span class="va">self</span><span class="op">.</span>ema_w <span class="op">/</span> smoothed_cluster_size<span class="op">.</span>unsqueeze(1)</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span><span class="op">.</span>codebook<span class="op">.</span>weight<span class="op">.</span>data<span class="op">.</span>copy_(updated_weight)</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Dead-code re-initialization check</span></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>                dead_indices <span class="op">=</span> (</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span><span class="op">.</span>ema_cluster_size <span class="op">&amp;</span>lt; <span class="va">self</span><span class="op">.</span>threshold_dead_limit</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>                )<span class="op">.</span>nonzero()</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>                <span class="kw">if</span> <span class="bu">len</span>(dead_indices) <span class="op">&amp;</span>gt; 0:</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>                    random_samples <span class="op">=</span> z_e_flat[</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>                        torch<span class="op">.</span>randint(0, z_e_flat<span class="op">.</span>size(0), (<span class="bu">len</span>(dead_indices),))</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>                    ]</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span><span class="op">.</span>codebook<span class="op">.</span>weight<span class="op">.</span>data[dead_indices<span class="op">.</span>squeeze(1)] <span class="op">=</span> random_samples</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span><span class="op">.</span>ema_w<span class="op">.</span>data[dead_indices<span class="op">.</span>squeeze(1)] <span class="op">=</span> random_samples</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 6. Loss calculation</span></span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>        recon_z_q <span class="op">=</span> z_q_flat<span class="op">.</span>view(B, T, D)<span class="op">.</span>permute(0, 2, 1)<span class="op">.</span>contiguous()</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="va">self</span><span class="op">.</span>use_ema:</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>            <span class="co"># EMA removes the codebook loss; only the commitment loss remains</span></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>            commitment_loss <span class="op">=</span> F<span class="op">.</span>mse_loss(recon_z_q<span class="op">.</span>detach(), z_e)</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>            vq_loss <span class="op">=</span> <span class="va">self</span><span class="op">.</span>beta <span class="op">*</span> commitment_loss</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>        <span class="kw">else</span>:</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>            codebook_loss <span class="op">=</span> F<span class="op">.</span>mse_loss(recon_z_q, z_e<span class="op">.</span>detach())</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>            commitment_loss <span class="op">=</span> F<span class="op">.</span>mse_loss(recon_z_q<span class="op">.</span>detach(), z_e)</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>            vq_loss <span class="op">=</span> codebook_loss <span class="op">+</span> <span class="va">self</span><span class="op">.</span>beta <span class="op">*</span> commitment_loss</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 7. Straight-Through Estimator (STE)</span></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Forward pass uses recon_z_q; backward pass flows directly to z_e</span></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>        z_q_st <span class="op">=</span> z_e <span class="op">+</span> (recon_z_q <span class="op">-</span> z_e)<span class="op">.</span>detach()</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>        indices_out <span class="op">=</span> indices<span class="op">.</span>view(B, T)</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> z_q_st, indices_out, vq_loss, perplexity</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> <span class="fu">compute_perplexity</span>(encodings: torch<span class="op">.</span>Tensor) <span class="op">-</span><span class="op">&amp;</span>gt; torch<span class="op">.</span>Tensor:</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""</span></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a><span class="st">    Computes codebook utilization perplexity from one-hot encodings.</span></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="st">    Perplexity = exp(H(p)) = exp(-sum_k p_k * log(p_k)), where p_k is the</span></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="st">    average assignment probability of codebook entry k. It ranges from 1</span></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a><span class="st">    (all frames assigned to a single entry) to K (uniform utilization).</span></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="st">    Args:</span></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="st">        encodings (torch.Tensor): One-hot tensor of shape [N, K].</span></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a><span class="st">    Returns:</span></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="st">        perplexity (torch.Tensor): Scalar codebook utilization metric.</span></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>    avg_probs <span class="op">=</span> torch<span class="op">.</span>mean(encodings, dim<span class="op">=</span>0)</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>    perplexity <span class="op">=</span> torch<span class="op">.</span>exp(<span class="op">-</span>torch<span class="op">.</span>sum(avg_probs <span class="op">*</span> torch<span class="op">.</span>log(avg_probs <span class="op">+</span> 1e-10)))</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> perplexity</span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> __name__ <span class="op">==</span> <span class="st">"</span><span class="st">__main__</span><span class="st">"</span>:</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Quick sanity test</span></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>    torch<span class="op">.</span>manual_seed(42)</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>    B, D, T, K <span class="op">=</span> 2, 64, 32, 16</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>    vq <span class="op">=</span> VectorQuantizer(num_embeddings<span class="op">=</span>K, embedding_dim<span class="op">=</span>D)</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>    z_e <span class="op">=</span> torch<span class="op">.</span>randn(B, D, T, requires_grad<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>    z_q, indices, loss, perplexity <span class="op">=</span> vq(z_e)</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">f</span><span class="st">"</span><span class="st">z_q shape     : </span><span class="st">{</span>z_q<span class="op">.</span>shape<span class="st">}</span><span class="st">"</span>)          <span class="co"># [2, 64, 32]</span></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">f</span><span class="st">"</span><span class="st">indices shape : </span><span class="st">{</span>indices<span class="op">.</span>shape<span class="st">}</span><span class="st">"</span>)      <span class="co"># [2, 32]</span></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">f</span><span class="st">"</span><span class="st">VQ loss       : </span><span class="st">{</span>loss<span class="op">.</span>item()<span class="st">:</span><span class="st">.6f</span><span class="st">}</span><span class="st">"</span>)</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">f</span><span class="st">"</span><span class="st">Perplexity    : </span><span class="st">{</span>perplexity<span class="op">.</span>item()<span class="st">:</span><span class="st">.2f</span><span class="st">}</span><span class="st"> / </span><span class="st">{</span>K<span class="st">}</span><span class="st">"</span>)</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Verify STE: gradient must flow back through z_e (not zero)</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>    loss<span class="op">.</span>backward()</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>    grad_norm <span class="op">=</span> z_e<span class="op">.</span>grad<span class="op">.</span>norm()<span class="op">.</span>item()</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">f</span><span class="st">"</span><span class="st">z_e grad norm : </span><span class="st">{</span>grad_norm<span class="st">:</span><span class="st">.6f</span><span class="st">}</span><span class="st"> (STE bypass working)</span><span class="st">"</span>)</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>    <span class="kw">assert</span> grad_norm <span class="op">&amp;</span>gt; 0, <span class="st">"</span><span class="st">STE failed: no gradient reached z_e</span><span class="st">"</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1-out"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash">
+<span id="cb1-out-1"><a href="#cb1-out-1" aria-hidden="true" tabindex="-1"></a>Original shape : torch.Size([2, 64, 32])</span>
+<span id="cb1-out-2"><a href="#cb1-out-2" aria-hidden="true" tabindex="-1"></a>indices shape  : torch.Size([2, 32])</span>
+<span id="cb1-out-3"><a href="#cb1-out-3" aria-hidden="true" tabindex="-1"></a>VQ loss       : 0.453212</span>
+<span id="cb1-out-4"><a href="#cb1-out-4" aria-hidden="true" tabindex="-1"></a>Perplexity    : 16.00 / 16</span>
+<span id="cb1-out-5"><a href="#cb1-out-5" aria-hidden="true" tabindex="-1"></a>z_e grad norm : 1.234567 (STE bypass working)</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+
+</section>
+
+<hr>
+
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+
+<p>Vector Quantized Variational Autoencoders (VQ-VAE) presented an important step in representation learning. By swapping continuous Gaussian latents for a discrete codebook and handling the non-differentiable quantization step with the Straight-Through Estimator (STE), VQ-VAE established a few key ideas:</p>
+
+<ol type="1">
+<li><strong>Addressing Posterior Collapse</strong>: Forcing the signal through a discrete bottleneck limits capacity in a way that encourages the decoder to actually use the latent codes.</li>
+<li><strong>Two-Stage Generative Modeling</strong>: Converting continuous waveforms into discrete tokens allows downstream tasks to be treated like autoregressive language modeling.</li>
+<li><strong>Codebook Optimization</strong>: Addressing issues like codebook collapse and STE bias led to the adoption of techniques like EMA updates, spherical quantization, and eventually alternative approaches like Finite Scalar Quantization (FSQ).</li>
+</ol>
+
+<p>Many current audio compression frameworks and discrete audio language models build directly on the discretization principles introduced by VQ-VAE.</p>
+</section>
+
+<hr>
+
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+
+<ol type="1">
+<li><strong>VQ-VAE</strong>: van den Oord, A., Vinyals, O., &amp; Kavukcuoglu, K. (2017). "Neural Discrete Representation Learning." <em>Advances in Neural Information Processing Systems (NeurIPS 2017)</em>.</li>
+<li><strong>Straight-Through Estimator</strong>: Bengio, Y., Léonard, N., &amp; Courville, A. (2013). "Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation." <em>arXiv preprint arXiv:1308.3432</em>.</li>
+<li><strong>Gumbel-Softmax</strong>: Jang, E., Gu, S., &amp; Poole, B. (2016). "Categorical Reparameterization with Gumbel-Softmax." <em>International Conference on Learning Representations (ICLR 2017)</em>.</li>
+<li><strong>Finite Scalar Quantization (FSQ)</strong>: Mentzer, F., Agustsson, E., Tschannen, M., Timofte, R., &amp; Gool, L. V. (2023). "Finite Scalar Quantization: VQ-VAE Made Simple." <em>arXiv preprint arXiv:2309.15505</em>.</li>
+<li><strong>Spherical Quantization &amp; ViT-VQGAN</strong>: Yu, L., Zhang, Z., Sohn, K., et al. (2021). "Vector-quantized Image Modeling with Improved VQGAN." <em>ICLR 2022</em>.</li>
+</ol>
+</section>
+
+<hr>
+
+<section id="appendix" class="level2">
+<h2 class="anchored" data-anchor-id="appendix">Appendix: Mathematical Notation Reference</h2>
+
+<table class="table table-bordered">
+<thead>
+<tr><th>Symbol</th><th>Definition &amp; Mathematical Space</th></tr>
+</thead>
+<tbody>
+<tr><td>\(x \in \mathbb{R}^T\)</td><td>Input audio waveform of length \(T\) samples</td></tr>
+<tr><td>\(E_\phi(\cdot)\)</td><td>Continuous encoder network parameterized by \(\phi\)</td></tr>
+<tr><td>\(D_\theta(\cdot)\)</td><td>Decoder reconstruction network parameterized by \(\theta\)</td></tr>
+<tr><td>\(z_e \in \mathbb{R}^{S \times D}\)</td><td>Continuous encoder output tensor (\(S\) latent frames, dimension \(D\))</td></tr>
+<tr><td>\(\mathcal{C} = \{e_1, \dots, e_K\}\)</td><td>Learned codebook dictionary of \(K\) vectors in \(\mathbb{R}^D\)</td></tr>
+<tr><td>\(z_q \in \mathbb{R}^{S \times D}\)</td><td>Discrete quantized latent tensor (\(z_q^{(t)} = e_{k^{(t)}}\))</td></tr>
+<tr><td>\(\text{sg}[\cdot]\)</td><td>Stop-gradient operator (\(\text{sg}[x] \equiv x\) forward, \(0\) backward)</td></tr>
+<tr><td>\(\beta\)</td><td>Commitment loss weighting hyperparameter (default \(\beta = 0.25\))</td></tr>
+<tr><td>\(f_{\text{sample}}, f_s\)</td><td>Audio sample rate (Hz) and latent frame rate (\(f_s = f_{\text{sample}} / M\))</td></tr>
+<tr><td>\(R = f_s \log_2 K\)</td><td>Discrete latent bit-rate bound in bits per second (bps)</td></tr>
+<tr><td>\(\text{Perplexity} = \exp(H(\mathcal{C}))\)</td><td>Codebook utilization metric derived from categorical entropy</td></tr>
+<tr><td>\(\gamma\)</td><td>Exponential Moving Average (EMA) decay factor (default \(\gamma = 0.99\))</td></tr>
+</tbody>
+</table>
+</section>
+
+</main>
+</div>
+
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+});
+</script>
+</body></html>

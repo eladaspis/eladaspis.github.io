@@ -1,0 +1,23 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  description: "Personal Website & Blog"
+  site-url: https://eladaspis.github.io
+  title: "Elad Aspis"
+  open-graph: true
+  twitter-card: true
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/eladaspis
+      - icon: linkedin
+        href: https://www.linkedin.com/in/eladaspis
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+    css: styles.css
