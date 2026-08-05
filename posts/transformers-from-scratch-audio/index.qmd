@@ -29,6 +29,8 @@ Where:
 
 We then map these frequencies to the **Mel scale**, which mimics human hearing (being more sensitive to pitch changes at lower frequencies), resulting in our Mel-Spectrogram $S \in \mathbb{R}^{F \times T}$, where $F$ is the number of frequency bins and $T$ is the number of time frames.
 
+![**Figure 1:** The audio preprocessing pipeline — a raw waveform is transformed via the Short-Time Fourier Transform (STFT) into a spectrogram, then compressed through a Mel filter bank to produce the final Mel-Spectrogram that serves as input to the Transformer.](assets/waveform_to_mel.png)
+
 ---
 
 ## Patching the Audio (Like ViT)
@@ -41,6 +43,8 @@ The total number of patches $N$ is:
 $$ N = \frac{F}{P_F} \times \frac{T}{P_T} $$
 
 Each patch is flattened into a 1D vector and passed through a linear layer (a linear projection) to create patch embeddings of dimension $D$.
+
+![**Figure 2:** Spectrogram patching — the 2D Mel-Spectrogram is divided into a grid of non-overlapping patches (like ViT), each flattened and linearly projected into a patch embedding vector. A learnable [CLS] token is prepended to the sequence.](assets/spectrogram_patching.png)
 
 ### PyTorch Implementation: Audio Patch Embedding
 
@@ -111,9 +115,13 @@ $$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right
 
 For example, a patch containing a sharp transient (like a drum hit) might attend strongly to the subsequent ringing frequencies to understand the full acoustic context.
 
+![**Figure 3:** Scaled Dot-Product Self-Attention — each patch embedding is projected into Query, Key, and Value vectors. The attention scores reveal which audio patches are most relevant to each other, enabling the model to capture long-range acoustic dependencies.](assets/self_attention.png)
+
 ---
 
 ## Putting It All Together: The Audio Transformer
+
+![**Figure 4:** The complete Audio Transformer architecture — from raw audio input through Mel-Spectrogram extraction, patch embedding with positional encoding, through multiple Transformer encoder layers, to final classification via the [CLS] token.](assets/full_architecture.png)
 
 Let's stack the standard Transformer Encoder blocks on top of our embeddings. We will output the final representation of the `[CLS]` token to classify the audio (e.g., "Dog barking" vs "Car horn").
 
