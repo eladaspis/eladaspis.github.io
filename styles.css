@@ -345,3 +345,56 @@ pre, code, table {
     margin-bottom: 1.5rem;
   }
 }
+
+/* ============================================================
+   Post Figures — Side-by-Side & Restrained Sizing
+   ============================================================ */
+.quarto-figure {
+  margin: 1.5rem 0;
+}
+
+.figure-side {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.figure-side .quarto-figure,
+.figure-side figure {
+  flex: 0 0 45%;
+  max-width: 450px;
+  margin: 0;
+}
+
+.figure-side .figure-text {
+  flex: 1;
+}
+
+/* Limit standalone figure size so images aren't huge */
+.quarto-figure img,
+figure img {
+  max-width: 80% !important;
+  max-height: 400px;
+  object-fit: contain;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .figure-side {
+    flex-direction: column;
+  }
+  .figure-side .quarto-figure,
+  .figure-side figure {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+  .quarto-figure img,
+  figure img {
+    max-width: 100% !important;
+  }
+}
+

@@ -311,3 +311,90 @@ pre, code, table {
 :target, h1, h2, h3, h4, h5, h6, section {
   scroll-margin-top: 80px !important;
 }
+
+/* ============================================================
+   Blog Listing Page — Main Title & Subtitle Header
+   ============================================================ */
+.blog-header {
+  padding: 3.5rem 0 2rem 0;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 2.5rem;
+}
+
+.blog-main-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0 0 0.6rem 0;
+}
+
+.blog-subtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #6b7280;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 65ch;
+}
+
+@media (max-width: 768px) {
+  .blog-header {
+    padding: 2rem 0 1.5rem 0;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* ============================================================
+   Post Figures — Side-by-Side & Restrained Sizing
+   ============================================================ */
+.quarto-figure {
+  margin: 1.5rem 0;
+}
+
+.figure-side {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.figure-side .quarto-figure,
+.figure-side figure {
+  flex: 0 0 45%;
+  max-width: 450px;
+  margin: 0;
+}
+
+.figure-side .figure-text {
+  flex: 1;
+}
+
+/* Limit standalone figure size so images aren't huge */
+.quarto-figure img,
+figure img {
+  max-width: 80% !important;
+  max-height: 400px;
+  object-fit: contain;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .figure-side {
+    flex-direction: column;
+  }
+  .figure-side .quarto-figure,
+  .figure-side figure {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+  .quarto-figure img,
+  figure img {
+    max-width: 100% !important;
+  }
+}
+
