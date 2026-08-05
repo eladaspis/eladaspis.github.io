@@ -1,5 +1,6 @@
 ---
-title: "Vector Quantized VAEs (VQ-VAE): Math, Codebook Collapse & PyTorch Implementation"
+title: "Vector Quantized VAEs (VQ-VAE)"
+subtitle: "Math, Codebook Collapse & PyTorch Implementation"
 author: "Elad Aspis"
 date: "2026-07-20"
 categories: [audio, machine-learning, vq-vae, neural-compression, deep-learning]
