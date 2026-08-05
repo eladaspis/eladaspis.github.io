@@ -4,7 +4,6 @@ listing:
   - id: posts
     contents:
       - posts/transformers-from-scratch-audio/index.qmd
-      - posts/transformers-for-audio-generation/index.qmd
       - posts/vq-vae-audio-encoders/index.qmd
       - posts/lora-serverless-fine-tuning/index.qmd
       - posts/fsdp-ray-train/index.qmd
