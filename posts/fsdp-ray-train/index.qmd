@@ -1,5 +1,6 @@
 ---
-title: "Inside FSDP with PyTorch and Ray: Scaling Model Training with Fully Sharded Data Parallel"
+title: "Inside FSDP with PyTorch and Ray"
+subtitle: "Scaling Model Training with Fully Sharded Data Parallel"
 author: "Suman Debnath"
 date: "2026-02-06"
 categories: [distributed-training, deep-learning, ray, pytorch, fsdp, deepspeed, fine-tuning, qwen3-tts]

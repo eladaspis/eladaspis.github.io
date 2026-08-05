@@ -1,5 +1,6 @@
 ---
-title: "From Single GPU to Clusters: A Practical Journey into Distributed Training with PyTorch and Ray"
+title: "From Single GPU to Clusters"
+subtitle: "A Practical Journey into Distributed Training with PyTorch and Ray"
 author: "Suman Debnath"
 date: "2025-11-30"
 categories: [distributed-training, deep-learning, ray, pytorch]

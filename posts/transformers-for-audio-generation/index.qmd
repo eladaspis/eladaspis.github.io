@@ -1,5 +1,6 @@
 ---
-title: "Transformers for Audio Generation: From Neural Codecs to Flow Matching & Parallel Decoding"
+title: "Transformers for Audio Generation"
+subtitle: "From Neural Codecs to Flow Matching & Parallel Decoding"
 author: "Elad Aspis"
 date: "2026-08-01"
 categories: [audio, machine-learning, transformers, neural-codecs, audio-generation, deep-learning, flow-matching]

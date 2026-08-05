@@ -1,5 +1,6 @@
 ---
-title: "Fine-Tuning from First Principles: LoRA, QLoRA, and Serverless Fine-Tuning on Crusoe"
+title: "Fine-Tuning from First Principles"
+subtitle: "LoRA, QLoRA, and Serverless Fine-Tuning on Crusoe"
 author: "Suman Debnath"
 date: "2026-07-30"
 categories: [fine-tuning, lora, qlora, quantization, peft, llm, deep-learning, crusoe]
