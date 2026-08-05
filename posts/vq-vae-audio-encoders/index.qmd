@@ -6,6 +6,10 @@ categories: [audio, machine-learning, vq-vae, neural-compression, deep-learning]
 image: "assets/vqvae_fig1_left.png"
 toc: true
 description: "A deep dive into Vector Quantized Variational Autoencoders (VQ-VAE) — mathematical ELBO derivations, rate-distortion bounds, Straight-Through Estimator (STE) gradient bias, codebook collapse dynamics, EMA updates, spherical quantization, and production-grade PyTorch implementation."
+aliases:
+  - /blog/2026/07/20/audio-encoders-from-vqvae-to-modern
+  - /blog/2026/07/20/audio-encoders-from-vqvae-to-modern/
+  - /blog/2026/07/20/audio-encoders-from-vqvae-to-modern.html
 ---
 
 Vector Quantized Variational Autoencoders (VQ-VAE) offer a different approach to representation learning by replacing continuous Gaussian latents with **discrete categorical codes**. Forcing high-dimensional signals, like audio, through a finite codebook bottleneck solves issues like posterior collapse and provides direct control over the rate-distortion tradeoff. This formulation is the basis for many modern neural audio codecs and discrete audio language models.

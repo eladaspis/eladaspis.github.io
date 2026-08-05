@@ -104,6 +104,162 @@ Jukebox (Dhariwal et al.) was one of the earliest large-scale Transformer models
 
 ---
 
+### 3.2 VALL-E (Microsoft, 2023): AR + NAR Cascade for Speech Synthesis
+
+Microsoft's **VALL-E** (Wang et al., 2023) demonstrated how neural audio codecs can unlock zero-shot text-to-speech (TTS) language modeling. VALL-E models text phonemes $y$ and an 8-level EnCodec acoustic matrix $C \in \{1, \dots, K\}^{8 \times S}$.
+
+To handle the multi-codebook structure of RVQ without exploding sequence length, VALL-E splits generation into a two-stage hybrid cascade:
+
+1. **Autoregressive (AR) Stage**: A causal Transformer predicts the first codebook level $c_1 = (c_{1,1}, \dots, c_{1,S})$ sequentially given text phonemes $y$ and a short 3-second acoustic prompt $c_{1,:3s}$:
+   $$p(c_1 \mid y, c_{1,:3s}) = \prod_{t=1}^S p(c_{1,t} \mid c_{1,<t}, y)$$
+2. **Non-Autoregressive (NAR) Stage**: Seven separate non-causal Transformers generate codebook levels $c_2, \dots, c_8$ iteratively. For quantizer level $m \in \{2, \dots, 8\}$, the model predicts $c_m$ in parallel across all time steps $t=1 \dots S$, conditioned on phonemes $y$ and all previous quantizers $c_{<m}$:
+   $$p(c_m \mid y, c_{<m}) = \prod_{t=1}^S p(c_{m,t} \mid y, c_{<m})$$
+
+---
+
+### 3.3 MusicGen / AudioCraft (Meta, 2023): Multi-Codebook Delay Pattern Interleaving
+
+While VALL-E requires cascading 8 separate Transformer models (1 AR + 7 NAR), Meta's **MusicGen** (Copet et al., 2023) introduced a breakthrough solution: **Codebook Delay Pattern Interleaving**.
+
+MusicGen generates all $M$ RVQ codebook streams using a **single causal Transformer**.
+
+#### The Codebook Delay Pattern
+Instead of predicting $c_{m, t}$ at the exact same timestep $t$, MusicGen introduces a step delay of $m-1$ frames for the $m$-th codebook stream:
+
+$$x_{m, t} = c_{m, t - m + 1}$$
+
+| Time Step | Codebook 1 ($m=1$) | Codebook 2 ($m=2$) | Codebook 3 ($m=3$) | Codebook 4 ($m=4$) |
+| :---: | :---: | :---: | :---: | :---: |
+| **$t=1$** | $c_{1,1}$ | $\text{PAD}$ | $\text{PAD}$ | $\text{PAD}$ |
+| **$t=2$** | $c_{1,2}$ | $c_{2,1}$ | $\text{PAD}$ | $\text{PAD}$ |
+| **$t=3$** | $c_{1,3}$ | $c_{2,2}$ | $c_{3,1}$ | $\text{PAD}$ |
+| **$t=4$** | $c_{1,4}$ | $c_{2,3}$ | $c_{3,2}$ | $c_{4,1}$ |
+| **$t=5$** | $c_{1,5}$ | $c_{2,4}$ | $c_{3,3}$ | $c_{4,2}$ |
+
+By introducing this temporal shift, at step $t$, quantizer $m$ is predicted conditioned on $c_{m-1, t-1}$ (the previous codebook at the same acoustic frame). Thus, a single causal self-attention mechanism can model both intra-frame hierarchical codebook dependencies and inter-frame temporal dependencies simultaneously without any extra parameter overhead or sub-models!
+
+---
+
+### 3.4 PyTorch Implementation: Multi-Codebook Audio Transformer
+
+Here is a complete, standalone PyTorch implementation of a Multi-Codebook Autoregressive Audio Transformer implementing Meta's MusicGen Codebook Delay Pattern Interleaving:
+
+```python
+import torch
+import torch.nn as nn
+
+class MultiCodebookAudioTransformer(nn.Module):
+    """
+    Multi-Codebook Autoregressive Audio Generation Transformer (MusicGen style).
+    Generates M parallel RVQ token streams using temporal delay pattern interleaving.
+    
+    Args:
+        num_codebooks (int): Number of RVQ codebook levels (M), e.g. 4.
+        codebook_size (int): Vocabulary size per codebook (K), e.g. 1024.
+        d_model (int): Hidden dimension of the Transformer.
+        nhead (int): Number of self-attention heads.
+        num_layers (int): Number of Transformer decoder layers.
+    """
+    def __init__(self, num_codebooks=4, codebook_size=1024, d_model=512, nhead=8, num_layers=6):
+        super().__init__()
+        self.num_codebooks = num_codebooks
+        self.codebook_size = codebook_size
+        self.d_model = d_model
+        
+        # M separate embedding tables for each RVQ level (+1 index reserved for PAD token)
+        self.embeddings = nn.ModuleList([
+            nn.Embedding(codebook_size + 1, d_model, padding_idx=codebook_size)
+            for _ in range(num_codebooks)
+        ])
+        
+        # Sinusoidal / Learnable Positional Embedding
+        self.pos_emb = nn.Parameter(torch.zeros(1, 2048, d_model))
+        
+        # Causal Transformer Decoder
+        decoder_layer = nn.TransformerDecoderLayer(
+            d_model=d_model,
+            nhead=nhead,
+            dim_feedforward=d_model * 4,
+            activation='gelu',
+            batch_first=True
+        )
+        self.transformer = nn.TransformerDecoder(decoder_layer, num_layers=num_layers)
+        
+        # M separate prediction heads (one linear projection per RVQ level)
+        self.heads = nn.ModuleList([
+            nn.Linear(d_model, codebook_size)
+            for _ in range(num_codebooks)
+        ])
+
+    def apply_delay_pattern(self, tokens):
+        """
+        Interleaves tokens across codebooks with temporal offset (m - 1).
+        tokens: (B, M, S)
+        returns: (B, M, S + M - 1)
+        """
+        B, M, S = tokens.shape
+        pad_idx = self.codebook_size
+        delayed = torch.full((B, M, S + M - 1), pad_idx, dtype=tokens.dtype, device=tokens.device)
+        
+        for m in range(M):
+            delayed[:, m, m : m + S] = tokens[:, m, :]
+            
+        return delayed
+
+    def forward(self, tokens):
+        """
+        Forward pass computing next-token prediction logits.
+        tokens: (Batch, Num_Codebooks, Seq_Len)
+        """
+        B, M, S = tokens.shape
+        
+        # 1. Apply temporal delay pattern
+        delayed = self.apply_delay_pattern(tokens)  # Shape: (B, M, S + M - 1)
+        S_delayed = delayed.shape[2]
+        
+        # 2. Sum embeddings across codebook streams at each time step
+        x = torch.zeros((B, S_delayed, self.d_model), device=tokens.device)
+        for m in range(M):
+            x = x + self.embeddings[m](delayed[:, m, :])
+            
+        # 3. Add positional embeddings
+        x = x + self.pos_emb[:, :S_delayed, :]
+        
+        # 4. Enforce causal mask for self-attention
+        causal_mask = torch.triu(
+            torch.full((S_delayed, S_delayed), float('-inf'), device=tokens.device), 
+            diagonal=1
+        )
+        
+        # 5. Transformer forward pass
+        dummy_memory = torch.zeros((B, 1, self.d_model), device=tokens.device)
+        h = self.transformer(tgt=x, memory=dummy_memory, tgt_mask=causal_mask)
+        
+        # 6. Extract predictions per codebook level
+        logits = torch.zeros((B, M, S, self.codebook_size), device=tokens.device)
+        for m in range(M):
+            h_m = h[:, m : m + S, :]
+            logits[:, m, :, :] = self.heads[m](h_m)
+            
+        return logits
+
+
+# --- Verification & Inference Check ---
+if __name__ == "__main__":
+    # Batch = 2, 4 Codebooks (e.g. EnCodec 24kHz), 100 time frames (2 seconds @ 50 Hz)
+    B, M, S = 2, 4, 100
+    dummy_tokens = torch.randint(0, 1024, (B, M, S))
+    
+    model = MultiCodebookAudioTransformer(num_codebooks=M, codebook_size=1024)
+    logits = model(dummy_tokens)
+    
+    print("MultiCodebookAudioTransformer forward pass succeeded!")
+    print(f"Input Tokens shape:  {dummy_tokens.shape} (B={B}, M={M}, S={S})")
+    print(f"Output Logits shape: {logits.shape} (B={B}, M={M}, S={S}, Vocab=1024)")
+```
+
+---
+
 ## 4. Paradigm 2: Non-Autoregressive (NAR) & Masked Parallel Decoding
 
 ### SoundStorm (Google, 2023)
