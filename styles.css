@@ -311,3 +311,37 @@ pre, code, table {
 :target, h1, h2, h3, h4, h5, h6, section {
   scroll-margin-top: 80px !important;
 }
+
+/* ============================================================
+   Blog Listing Page — Main Title & Subtitle Header
+   ============================================================ */
+.blog-header {
+  padding: 3.5rem 0 2rem 0;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 2.5rem;
+}
+
+.blog-main-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0 0 0.6rem 0;
+}
+
+.blog-subtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #6b7280;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 65ch;
+}
+
+@media (max-width: 768px) {
+  .blog-header {
+    padding: 2rem 0 1.5rem 0;
+    margin-bottom: 1.5rem;
+  }
+}

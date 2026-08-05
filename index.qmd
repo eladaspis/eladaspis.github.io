@@ -1,5 +1,5 @@
 ---
-title: "My Blog"
+title: "Blog"
 listing:
   - id: posts
     contents:
@@ -11,4 +11,13 @@ listing:
       - posts/distributed-training-from-scratch/index.qmd
     type: default
     sort: "date desc"
+page-layout: full
 ---
+
+<div class="blog-header">
+  <h1 class="blog-main-title">Technical Writing</h1>
+  <p class="blog-subtitle">Deep dives into machine learning, audio AI, and distributed systems — with math, code, and intuition.</p>
+</div>
+
+::: {#posts}
+:::
