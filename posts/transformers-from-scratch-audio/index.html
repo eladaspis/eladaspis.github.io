@@ -203,33 +203,32 @@ window.Quarto = { typesetMath };
 <hr>
 <section id="how-do-we-feed-audio-to-a-transformer" class="level2">
 <h2 class="anchored" data-anchor-id="how-do-we-feed-audio-to-a-transformer">How Do We Feed Audio to a Transformer?</h2>
-<div class="figure-side">
-<div class="figure-text">
 <p>Unlike text, which is naturally discrete (words/tokens), audio is a continuous 1D signal (a waveform). While some models (like Wav2Vec 2.0) process raw waveforms directly, it is often much more efficient to convert the audio into a 2D representation: the <strong>Mel-Spectrogram</strong>.</p>
 <section id="the-math-short-time-fourier-transform-stft" class="level3">
 <h3 class="anchored" data-anchor-id="the-math-short-time-fourier-transform-stft">The Math: Short-Time Fourier Transform (STFT)</h3>
 <p>To create a spectrogram, we apply the STFT. We take a window function <span class="math inline">\(w(n)\)</span> of length <span class="math inline">\(N\)</span>, slide it across the audio signal <span class="math inline">\(x(n)\)</span>, and compute the Discrete Fourier Transform (DFT) for each window:</p>
 <p><span class="math display">\[ X(m, \omega) = \sum_{n=-\infty}^{\infty} x(n) w(n - m) e^{-j\omega n} \]</span></p>
-<p>Where <span class="math inline">\(m\)</span> is the time frame index and <span class="math inline">\(\omega\)</span> is the frequency bin index. We then map these frequencies to the <strong>Mel scale</strong>, resulting in our Mel-Spectrogram <span class="math inline">\(S \in \mathbb{R}^{F \times T}\)</span>.</p>
-</section>
-</div>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(m\)</span> is the time frame index.</li>
+<li><span class="math inline">\(\omega\)</span> is the frequency bin index.</li>
+</ul>
+<p>We then map these frequencies to the <strong>Mel scale</strong>, which mimics human hearing (being more sensitive to pitch changes at lower frequencies), resulting in our Mel-Spectrogram <span class="math inline">\(S \in \mathbb{R}^{F \times T}\)</span>, where <span class="math inline">\(F\)</span> is the number of frequency bins and <span class="math inline">\(T\)</span> is the number of time frames.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="assets/waveform_to_mel.png" class="img-fluid figure-img" alt="Figure 1: The audio preprocessing pipeline"></p>
 <figcaption class="figure-caption"><strong>Figure 1:</strong> The audio preprocessing pipeline — a raw waveform is transformed via the Short-Time Fourier Transform (STFT) into a spectrogram, then compressed through a Mel filter bank to produce the final Mel-Spectrogram that serves as input to the Transformer.</figcaption>
 </figure>
 </div>
-</div>
 <hr>
+</section>
 </section>
 <section id="patching-the-audio-like-vit" class="level2">
 <h2 class="anchored" data-anchor-id="patching-the-audio-like-vit">Patching the Audio (Like ViT)</h2>
-<div class="figure-side">
-<div class="figure-text">
-<p>A Mel-Spectrogram is effectively a 2D single-channel image! We can borrow the core idea from the Vision Transformer (ViT). Instead of processing pixel by pixel, we divide the spectrogram into a grid of non-overlapping <strong>patches</strong>. Given a spectrogram <span class="math inline">\(S \in \mathbb{R}^{F \times T}\)</span>, we divide it into patches of size <span class="math inline">\(P_F \times P_T\)</span>. The total number of patches <span class="math inline">\(N\)</span> is:</p>
+<p>A Mel-Spectrogram is effectively a 2D single-channel image! We can borrow the core idea from the Vision Transformer (ViT). Instead of processing pixel by pixel, we divide the spectrogram into a grid of non-overlapping <strong>patches</strong>.</p>
+<p>Given a spectrogram <span class="math inline">\(S \in \mathbb{R}^{F \times T}\)</span>, we divide it into patches of size <span class="math inline">\(P_F \times P_T\)</span>. The total number of patches <span class="math inline">\(N\)</span> is:</p>
 <p><span class="math display">\[ N = \frac{F}{P_F} \times \frac{T}{P_T} \]</span></p>
-<p>Each patch is flattened into a 1D vector and passed through a linear projection layer to create patch embeddings of dimension <span class="math inline">\(D\)</span>.</p>
-</div>
+<p>Each patch is flattened into a 1D vector and passed through a linear layer (a linear projection) to create patch embeddings of dimension <span class="math inline">\(D\)</span>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="assets/spectrogram_patching.png" class="img-fluid figure-img" alt="Figure 2: Spectrogram patching"></p>
@@ -285,19 +284,17 @@ window.Quarto = { typesetMath };
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
 </section>
-<div class="figure-side">
-<div class="figure-text">
+<section id="the-self-attention-mechanism" class="level2">
+<h2 class="anchored" data-anchor-id="the-self-attention-mechanism">The Self-Attention Mechanism</h2>
 <p>This is the heart of the Transformer architecture. For every patch (token), the model computes a Query (<span class="math inline">\(Q\)</span>), Key (<span class="math inline">\(K\)</span>), and Value (<span class="math inline">\(V\)</span>).</p>
 <p>The Scaled Dot-Product Attention computes how much focus a given audio patch should place on every other patch in the spectrogram:</p>
 <p><span class="math display">\[ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V \]</span></p>
-<p>For example, a patch containing a sharp transient (like a drum hit) might attend strongly to subsequent ringing frequencies to understand the full acoustic context.</p>
-</div>
+<p>For example, a patch containing a sharp transient (like a drum hit) might attend strongly to the subsequent ringing frequencies to understand the full acoustic context.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="assets/self_attention.png" class="img-fluid figure-img" alt="Figure 3: Self-Attention mechanism"></p>
-<figcaption class="figure-caption"><strong>Figure 3:</strong> Scaled Dot-Product Self-Attention.</figcaption>
+<figcaption class="figure-caption"><strong>Figure 3:</strong> Scaled Dot-Product Self-Attention — each patch embedding is projected into Query, Key, and Value vectors. The attention scores reveal which audio patches are most relevant to each other, enabling the model to capture long-range acoustic dependencies.</figcaption>
 </figure>
-</div>
 </div>
 <hr>
 </section>
