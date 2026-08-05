@@ -198,28 +198,10 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">My Blog</h1>
+<div class="blog-header">
+  <h1 class="blog-main-title">Technical Writing</h1>
+  <p class="blog-subtitle">Deep dives into machine learning, audio AI, and distributed systems — with math, code, and intuition.</p>
 </div>
-
-
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-
-
-
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-posts">
 <div class="list quarto-listing-default">
@@ -231,10 +213,10 @@ window.Quarto = {
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/transformers-from-scratch-audio/index.html" class="no-external">Building Transformers for Audio from Scratch: Code, Math, and Theory</a>
+<a href="./posts/transformers-from-scratch-audio/index.html" class="no-external">Building Transformers for Audio from Scratch</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./posts/transformers-from-scratch-audio/index.html" class="no-external"></a>
+<a href="./posts/transformers-from-scratch-audio/index.html" class="no-external">Code, Math, and Theory</a>
 </div>
 <div class="listing-description">
 <a href="./posts/transformers-from-scratch-audio/index.html" class="no-external">A complete step-by-step guide to building an Audio Transformer from scratch in PyTorch. Learn how Mel-Spectrograms are converted into 2D patches, sinusoidal and learnable positional encodings, and self-attention for audio processing.</a>
@@ -249,6 +231,32 @@ Aug 2, 2026
 </div>
 </div>
 
+<div class="quarto-post image-right" data-index="transformers-for-audio-generation" data-listing-date-sort="1785541200000" data-listing-file-modified-sort="1785541200000" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2000">
+<div class="thumbnail">
+<p><a href="./posts/transformers-for-audio-generation/index.html" class="no-external"></a></p><a href="./posts/transformers-for-audio-generation/index.html" class="no-external">
+<p><img src="./posts/transformers-for-audio-generation/assets/raw_vs_codec_compression.svg" class="thumbnail-image"></p>
+</a><p><a href="./posts/transformers-for-audio-generation/index.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/transformers-for-audio-generation/index.html" class="no-external">Transformers for Audio Generation</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/transformers-for-audio-generation/index.html" class="no-external">From Neural Codecs to Flow Matching &amp; Parallel Decoding</a>
+</div>
+<div class="listing-description">
+<a href="./posts/transformers-for-audio-generation/index.html" class="no-external">An extensive deep dive into how Transformers conquered audio generation — building on neural audio encoders (VQ-VAE, RVQ), tracing multi-codebook pattern interleaving (MusicGen, VALL-E), masked parallel decoding (SoundStorm), and continuous flow matching (Voicebox).</a>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/transformers-for-audio-generation/index.html" class="no-external">
+<div class="listing-date">
+Aug 1, 2026
+</div>
+</a>
+</div>
+</div>
+
 <div class="quarto-post image-right" data-index="vq-vae" data-listing-date-sort="1721422800000" data-listing-file-modified-sort="1721522800000" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="2500">
 <div class="thumbnail">
 <p><a href="./posts/vq-vae-audio-encoders/index.html" class="no-external"></a></p><a href="./posts/vq-vae-audio-encoders/index.html" class="no-external">
@@ -257,10 +265,10 @@ Aug 2, 2026
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/vq-vae-audio-encoders/index.html" class="no-external">Vector Quantized VAEs (VQ-VAE): Math, Codebook Collapse &amp; PyTorch Implementation</a>
+<a href="./posts/vq-vae-audio-encoders/index.html" class="no-external">Vector Quantized VAEs (VQ-VAE)</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./posts/vq-vae-audio-encoders/index.html" class="no-external"></a>
+<a href="./posts/vq-vae-audio-encoders/index.html" class="no-external">Math, Codebook Collapse &amp; PyTorch Implementation</a>
 </div>
 <div class="listing-description">
 <a href="./posts/vq-vae-audio-encoders/index.html" class="no-external">A deep dive into Vector Quantized Variational Autoencoders for audio.</a>
@@ -283,8 +291,11 @@ Jul 20, 2026
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/lora-serverless-fine-tuning/index.html" class="no-external">Fine-Tuning from First Principles: LoRA, QLoRA, and Serverless Fine-Tuning on Crusoe</a>
+<a href="./posts/lora-serverless-fine-tuning/index.html" class="no-external">Fine-Tuning from First Principles</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/lora-serverless-fine-tuning/index.html" class="no-external">LoRA, QLoRA, and Serverless Fine-Tuning on Crusoe</a>
+</div>
 <div class="delink listing-description"><a href="./posts/lora-serverless-fine-tuning/index.html" class="no-external">
 <p>A ground-up journey into fine-tuning LLMs, where we build quantization and LoRA from scratch in plain PyTorch, combine them into QLoRA, and finally fine-tune Qwen3-8B into a PII redaction engine that outperforms a 70B model, using Crusoe’s Serverless Fine-Tuning.</p>
 </a></div>
@@ -308,8 +319,11 @@ Suman Debnath
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/fsdp-ray-train/index.html" class="no-external">Inside FSDP with PyTorch and Ray: Scaling Model Training with Fully Sharded Data Parallel</a>
+<a href="./posts/fsdp-ray-train/index.html" class="no-external">Inside FSDP with PyTorch and Ray</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/fsdp-ray-train/index.html" class="no-external">Scaling Model Training with Fully Sharded Data Parallel</a>
+</div>
 <div class="delink listing-description"><a href="./posts/fsdp-ray-train/index.html" class="no-external">
 <p>A deep dive into FSDP internals with visual walkthroughs, hands-on implementation with Ray, PyTorch and DeepSpeed, and finally training a fine-tuned voice cloning model using 1.7B parameter Qwen3-TTS to clone your own voice.</p>
 </a></div>
@@ -333,8 +347,11 @@ Suman Debnath
 </a></div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./posts/distributed-training-from-scratch/index.html" class="no-external">From Single GPU to Clusters: A Practical Journey into Distributed Training with PyTorch and Ray</a>
+<a href="./posts/distributed-training-from-scratch/index.html" class="no-external">From Single GPU to Clusters</a>
 </h3>
+<div class="listing-subtitle">
+<a href="./posts/distributed-training-from-scratch/index.html" class="no-external">A Practical Journey into Distributed Training with PyTorch and Ray</a>
+</div>
 <div class="delink listing-description"><a href="./posts/distributed-training-from-scratch/index.html" class="no-external">
 <p>In this blog, we’ll explore distributed training together, breaking down the core concepts and hands-on techniques for scaling deep learning models across multiple GPUs and machines using PyTorch and Ray.</p>
 </a></div>
@@ -347,7 +364,7 @@ Nov 30, 2025
 <div class="listing-author">
 Suman Debnath
 </div>
-</a>
+</a></a>
 </div>
 </div>
 </div>
