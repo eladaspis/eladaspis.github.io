@@ -14,37 +14,6 @@ In this post, we will build a Transformer for audio from scratch. We'll cover th
 
 ---
 
-## Key Milestones: How Transformers Transformed Audio AI
-
-Before diving into the implementation, it helps to understand how the Transformer architecture evolved to handle sound across different domains. Researchers adapted attention to audio in three distinct paradigms:
-
-| Model / Paper | Year | Domain / Task | Input Representation | Key Architectural Innovation |
-| :--- | :---: | :--- | :--- | :--- |
-| **[Music Transformer](https://arxiv.org/abs/1809.04281)** (Huang et al.) | 2018 | Symbolic Music Generation | MIDI Events | Relative positional self-attention for long sequences |
-| **[Wav2Vec 2.0](https://arxiv.org/abs/2006.11477)** (Baevski et al.) | 2020 | Self-Supervised Speech | Raw 1D Waveform | 1D CNN + Transformer encoder with Gumbel-VQ contrastive loss |
-| **[Conformer](https://arxiv.org/abs/2005.08100)** (Gulati et al.) | 2020 | Speech Recognition (ASR) | Mel-Spectrogram | Interleaved depthwise convolutions + self-attention |
-| **[AST](https://arxiv.org/abs/2104.01778)** (Gong et al.) | 2021 | Audio Event Classification | 2D Mel-Spectrogram Patches | Pure ViT architecture applied directly to spectrogram patches |
-| **[HuBERT](https://arxiv.org/abs/2106.07447)** (Hsu et al.) | 2021 | Self-Supervised Representation | Mel / Raw Waveform | Offline k-means pseudo-labeling with BERT-style masked prediction |
-| **[SepFormer](https://arxiv.org/abs/2010.13154)** (Subakan et al.) | 2021 | Source Separation | Time-domain learned frames | Dual-path Transformer (short-term & long-term attention) |
-| **[Whisper](https://arxiv.org/abs/2212.04356)** (OpenAI, Radford et al.) | 2022 | Multilingual Speech-to-Text | 80-channel Mel-Spectrogram | Large-scale weakly supervised Encoder-Decoder Transformer |
-| **[MusicGen](https://arxiv.org/abs/2306.05284)** & **[VALL-E](https://arxiv.org/abs/2301.02111)** | 2023 | Audio & Speech Generation | Discrete Codec Tokens (EnCodec) | Multi-codebook delay interleaving & AR+NAR cascades |
-
-### 1. Classification & Representation: AST & HuBERT
-- **[AST (Audio Spectrogram Transformer)](https://arxiv.org/abs/2104.01778)**: Showed that audio classification does not require specialized 1D CNNs or RNNs. By converting a Mel-Spectrogram into a grid of 2D patches (just like Vision Transformers process images), AST established SOTA performance on benchmarks like AudioSet and ESC-50.
-- **[HuBERT](https://arxiv.org/abs/2106.07447)** & **[Wav2Vec 2.0](https://arxiv.org/abs/2006.11477)**: Solved the lack of labeled audio data by introducing self-supervised pre-training. HuBERT uses offline k-means clustering to turn continuous acoustic frames into discrete target units, training the Transformer to predict masked tokens similar to BERT in NLP.
-
-### 2. Speech Recognition & Perception: Whisper & Conformer
-- **[Conformer](https://arxiv.org/abs/2005.08100)**: Combined the local feature-extraction power of CNNs with the global context of Transformers, creating the standard architecture for modern speech-to-text engines.
-- **[OpenAI Whisper](https://arxiv.org/abs/2212.04356)**: Demonstrated that scaling a standard Encoder-Decoder Transformer with simple Mel-Spectrogram inputs over 680,000 hours of weakly supervised web data yields human-level speech transcription and translation robustness across languages.
-
-### 3. Generation & Separation: MusicGen, VALL-E & SepFormer
-- **[SepFormer](https://arxiv.org/abs/2010.13154)**: Applied dual-path self-attention to separate overlapping speakers or instruments in the time domain without losing phase relationship.
-- **[MusicGen](https://arxiv.org/abs/2306.05284)** & **[VALL-E](https://arxiv.org/abs/2301.02111)**: Transformed audio generation from raw sample synthesis into discrete language modeling by quantizing audio into multi-stream neural codec tokens (EnCodec / DAC) and predicting them using delayed causal attention patterns.
-
-
-
----
-
 ## How Do We Feed Audio to a Transformer?
 
 Unlike text, which is naturally discrete (words/tokens), audio is a continuous 1D signal (a waveform). While some models (like Wav2Vec 2.0) process raw waveforms directly, it is often much more efficient to convert the audio into a 2D representation: the **Mel-Spectrogram**.
@@ -205,6 +174,35 @@ if __name__ == "__main__":
 
 ---
 
+## Key Milestones: How Transformers Transformed Audio AI
+
+Now that we've built an Audio Transformer from scratch, it helps to look at how researchers have adapted attention mechanisms across different audio domains:
+
+| Model / Paper | Year | Domain / Task | Input Representation | Key Architectural Innovation |
+| :--- | :---: | :--- | :--- | :--- |
+| **[Music Transformer](https://arxiv.org/abs/1809.04281)** (Huang et al.) | 2018 | Symbolic Music Generation | MIDI Events | Relative positional self-attention for long sequences |
+| **[Wav2Vec 2.0](https://arxiv.org/abs/2006.11477)** (Baevski et al.) | 2020 | Self-Supervised Speech | Raw 1D Waveform | 1D CNN + Transformer encoder with Gumbel-VQ contrastive loss |
+| **[Conformer](https://arxiv.org/abs/2005.08100)** (Gulati et al.) | 2020 | Speech Recognition (ASR) | Mel-Spectrogram | Interleaved depthwise convolutions + self-attention |
+| **[AST](https://arxiv.org/abs/2104.01778)** (Gong et al.) | 2021 | Audio Event Classification | 2D Mel-Spectrogram Patches | Pure ViT architecture applied directly to spectrogram patches |
+| **[HuBERT](https://arxiv.org/abs/2106.07447)** (Hsu et al.) | 2021 | Self-Supervised Representation | Mel / Raw Waveform | Offline k-means pseudo-labeling with BERT-style masked prediction |
+| **[SepFormer](https://arxiv.org/abs/2010.13154)** (Subakan et al.) | 2021 | Source Separation | Time-domain learned frames | Dual-path Transformer (short-term & long-term attention) |
+| **[Whisper](https://arxiv.org/abs/2212.04356)** (OpenAI, Radford et al.) | 2022 | Multilingual Speech-to-Text | 80-channel Mel-Spectrogram | Large-scale weakly supervised Encoder-Decoder Transformer |
+| **[MusicGen](https://arxiv.org/abs/2306.05284)** & **[VALL-E](https://arxiv.org/abs/2301.02111)** | 2023 | Audio & Speech Generation | Discrete Codec Tokens (EnCodec) | Multi-codebook delay interleaving & AR+NAR cascades |
+
+### 1. Classification & Representation: AST & HuBERT
+- **[AST (Audio Spectrogram Transformer)](https://arxiv.org/abs/2104.01778)**: Showed that audio classification does not require specialized 1D CNNs or RNNs. By converting a Mel-Spectrogram into a grid of 2D patches (just like Vision Transformers process images), AST established SOTA performance on benchmarks like AudioSet and ESC-50.
+- **[HuBERT](https://arxiv.org/abs/2106.07447)** & **[Wav2Vec 2.0](https://arxiv.org/abs/2006.11477)**: Solved the lack of labeled audio data by introducing self-supervised pre-training. HuBERT uses offline k-means clustering to turn continuous acoustic frames into discrete target units, training the Transformer to predict masked tokens similar to BERT in NLP.
+
+### 2. Speech Recognition & Perception: Whisper & Conformer
+- **[Conformer](https://arxiv.org/abs/2005.08100)**: Combined the local feature-extraction power of CNNs with the global context of Transformers, creating the standard architecture for modern speech-to-text engines.
+- **[OpenAI Whisper](https://arxiv.org/abs/2212.04356)**: Demonstrated that scaling a standard Encoder-Decoder Transformer with simple Mel-Spectrogram inputs over 680,000 hours of weakly supervised web data yields human-level speech transcription and translation robustness across languages.
+
+### 3. Generation & Separation: MusicGen, VALL-E & SepFormer
+- **[SepFormer](https://arxiv.org/abs/2010.13154)**: Applied dual-path self-attention to separate overlapping speakers or instruments in the time domain without losing phase relationship.
+- **[MusicGen](https://arxiv.org/abs/2306.05284)** & **[VALL-E](https://arxiv.org/abs/2301.02111)**: Transformed audio generation from raw sample synthesis into discrete language modeling by quantizing audio into multi-stream neural codec tokens (EnCodec / DAC) and predicting them using delayed causal attention patterns.
+
+---
+
 ## Conclusion
 
 By treating audio spectrograms as images and chopping them into patches, we can seamlessly apply the standard Transformer architecture to sound! This approach (AST) holds state-of-the-art records on benchmarks like AudioSet.
@@ -212,3 +210,4 @@ By treating audio spectrograms as images and chopping them into patches, we can 
 In a production scenario, you would want to add features like causal masking (if you are generating audio or doing real-time streaming) and dynamic padding. But the core concept remains beautifully simple. 
 
 Happy coding!
+

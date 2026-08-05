@@ -185,12 +185,12 @@ window.Quarto = { typesetMath };
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#key-milestones-how-transformers-transformed-audio-ai" id="toc-key-milestones-how-transformers-transformed-audio-ai" class="nav-link active" data-scroll-target="#key-milestones-how-transformers-transformed-audio-ai">Key Milestones: How Transformers Transformed Audio AI</a></li>
-  <li><a href="#how-do-we-feed-audio-to-a-transformer" id="toc-how-do-we-feed-audio-to-a-transformer" class="nav-link" data-scroll-target="#how-do-we-feed-audio-to-a-transformer">How Do We Feed Audio to a Transformer?</a></li>
+  <li><a href="#how-do-we-feed-audio-to-a-transformer" id="toc-how-do-we-feed-audio-to-a-transformer" class="nav-link active" data-scroll-target="#how-do-we-feed-audio-to-a-transformer">How Do We Feed Audio to a Transformer?</a></li>
   <li><a href="#patching-the-audio-like-vit" id="toc-patching-the-audio-like-vit" class="nav-link" data-scroll-target="#patching-the-audio-like-vit">Patching the Audio (Like ViT)</a></li>
   <li><a href="#positional-encoding" id="toc-positional-encoding" class="nav-link" data-scroll-target="#positional-encoding">Positional Encoding</a></li>
   <li><a href="#the-self-attention-mechanism" id="toc-the-self-attention-mechanism" class="nav-link" data-scroll-target="#the-self-attention-mechanism">The Self-Attention Mechanism</a></li>
   <li><a href="#putting-it-all-together-the-audio-transformer" id="toc-putting-it-all-together-the-audio-transformer" class="nav-link" data-scroll-target="#putting-it-all-together-the-audio-transformer">Putting It All Together: The Audio Transformer</a></li>
+  <li><a href="#key-milestones-how-transformers-transformed-audio-ai" id="toc-key-milestones-how-transformers-transformed-audio-ai" class="nav-link" data-scroll-target="#key-milestones-how-transformers-transformed-audio-ai">Key Milestones: How Transformers Transformed Audio AI</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   </ul>
 </nav>
@@ -200,104 +200,6 @@ window.Quarto = { typesetMath };
 
 <p>Transformers have completely revolutionized Natural Language Processing (NLP) and Computer Vision. But what about audio? Models like OpenAI’s Whisper, AST (Audio Spectrogram Transformer), and HuBERT have proven that the Transformer architecture is exceptionally powerful for audio processing tasks, including speech recognition, sound classification, and music generation.</p>
 <p>In this post, we will build a Transformer for audio from scratch. We’ll cover the core mathematics, the intuition behind processing sound waves, and implement the complete architecture in PyTorch.</p>
-<hr>
-<section id="key-milestones-how-transformers-transformed-audio-ai" class="level2">
-<h2 class="anchored" data-anchor-id="key-milestones-how-transformers-transformed-audio-ai">Key Milestones: How Transformers Transformed Audio AI</h2>
-<p>Before diving into the implementation, it helps to understand how the Transformer architecture evolved to handle sound across different domains. Researchers adapted attention to audio in three distinct paradigms:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Model / Paper</th>
-<th style="text-align: center;">Year</th>
-<th style="text-align: left;">Domain / Task</th>
-<th style="text-align: left;">Input Representation</th>
-<th style="text-align: left;">Key Architectural Innovation</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/1809.04281">Music Transformer</a></strong> (Huang et al.)</td>
-<td style="text-align: center;">2018</td>
-<td style="text-align: left;">Symbolic Music Generation</td>
-<td style="text-align: left;">MIDI Events</td>
-<td style="text-align: left;">Relative positional self-attention for long sequences</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2006.11477">Wav2Vec 2.0</a></strong> (Baevski et al.)</td>
-<td style="text-align: center;">2020</td>
-<td style="text-align: left;">Self-Supervised Speech</td>
-<td style="text-align: left;">Raw 1D Waveform</td>
-<td style="text-align: left;">1D CNN + Transformer encoder with Gumbel-VQ contrastive loss</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2005.08100">Conformer</a></strong> (Gulati et al.)</td>
-<td style="text-align: center;">2020</td>
-<td style="text-align: left;">Speech Recognition (ASR)</td>
-<td style="text-align: left;">Mel-Spectrogram</td>
-<td style="text-align: left;">Interleaved depthwise convolutions + self-attention</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2104.01778">AST</a></strong> (Gong et al.)</td>
-<td style="text-align: center;">2021</td>
-<td style="text-align: left;">Audio Event Classification</td>
-<td style="text-align: left;">2D Mel-Spectrogram Patches</td>
-<td style="text-align: left;">Pure ViT architecture applied directly to spectrogram patches</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2106.07447">HuBERT</a></strong> (Hsu et al.)</td>
-<td style="text-align: center;">2021</td>
-<td style="text-align: left;">Self-Supervised Representation</td>
-<td style="text-align: left;">Mel / Raw Waveform</td>
-<td style="text-align: left;">Offline k-means pseudo-labeling with BERT-style masked prediction</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2010.13154">SepFormer</a></strong> (Subakan et al.)</td>
-<td style="text-align: center;">2021</td>
-<td style="text-align: left;">Source Separation</td>
-<td style="text-align: left;">Time-domain learned frames</td>
-<td style="text-align: left;">Dual-path Transformer (short-term &amp; long-term attention)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2212.04356">Whisper</a></strong> (OpenAI, Radford et al.)</td>
-<td style="text-align: center;">2022</td>
-<td style="text-align: left;">Multilingual Speech-to-Text</td>
-<td style="text-align: left;">80-channel Mel-Spectrogram</td>
-<td style="text-align: left;">Large-scale weakly supervised Encoder-Decoder Transformer</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2306.05284">MusicGen</a></strong> &amp; <strong><a href="https://arxiv.org/abs/2301.02111">VALL-E</a></strong> (Meta / MS)</td>
-<td style="text-align: center;">2023</td>
-<td style="text-align: left;">Audio &amp; Speech Generation</td>
-<td style="text-align: left;">Discrete Codec Tokens (EnCodec)</td>
-<td style="text-align: left;">Multi-codebook delay interleaving &amp; AR+NAR cascades</td>
-</tr>
-</tbody>
-</table>
-
-<section id="classification-representation-ast-hubert" class="level3">
-<h3 class="anchored" data-anchor-id="classification-representation-ast-hubert">1. Classification &amp; Representation: AST &amp; HuBERT</h3>
-<ul>
-<li><strong><a href="https://arxiv.org/abs/2104.01778">AST (Audio Spectrogram Transformer)</a></strong>: Showed that audio classification does not require specialized 1D CNNs or RNNs. By converting a Mel-Spectrogram into a grid of 2D patches (just like Vision Transformers process images), AST established SOTA performance on benchmarks like AudioSet and ESC-50.</li>
-<li><strong><a href="https://arxiv.org/abs/2106.07447">HuBERT</a></strong> &amp; <strong><a href="https://arxiv.org/abs/2006.11477">Wav2Vec 2.0</a></strong>: Solved the lack of labeled audio data by introducing self-supervised pre-training. HuBERT uses offline k-means clustering to turn continuous acoustic frames into discrete target units, training the Transformer to predict masked tokens similar to BERT in NLP.</li>
-</ul>
-</section>
-
-<section id="speech-recognition-perception-whisper-conformer" class="level3">
-<h3 class="anchored" data-anchor-id="speech-recognition-perception-whisper-conformer">2. Speech Recognition &amp; Perception: Whisper &amp; Conformer</h3>
-<ul>
-<li><strong><a href="https://arxiv.org/abs/2005.08100">Conformer</a></strong>: Combined the local feature-extraction power of CNNs with the global context of Transformers, creating the standard architecture for modern speech-to-text engines.</li>
-<li><strong><a href="https://arxiv.org/abs/2212.04356">OpenAI Whisper</a></strong>: Demonstrated that scaling a standard Encoder-Decoder Transformer with simple Mel-Spectrogram inputs over 680,000 hours of weakly supervised web data yields human-level speech transcription and translation robustness across languages.</li>
-</ul>
-</section>
-
-<section id="generation-separation-musicgen-vall-e-sepformer" class="level3">
-<h3 class="anchored" data-anchor-id="generation-separation-musicgen-vall-e-sepformer">3. Generation &amp; Separation: MusicGen, VALL-E &amp; SepFormer</h3>
-<ul>
-<li><strong><a href="https://arxiv.org/abs/2010.13154">SepFormer</a></strong>: Applied dual-path self-attention to separate overlapping speakers or instruments in the time domain without losing phase relationship.</li>
-<li><strong><a href="https://arxiv.org/abs/2306.05284">MusicGen</a></strong> &amp; <strong><a href="https://arxiv.org/abs/2301.02111">VALL-E</a></strong>: Transformed audio generation from raw sample synthesis into discrete language modeling by quantizing audio into multi-stream neural codec tokens (EnCodec / DAC) and predicting them using delayed causal attention patterns.</li>
-</ul>
-</section>
-</section>
 <hr>
 <section id="how-do-we-feed-audio-to-a-transformer" class="level2">
 <h2 class="anchored" data-anchor-id="how-do-we-feed-audio-to-a-transformer">How Do We Feed Audio to a Transformer?</h2>
@@ -423,7 +325,7 @@ window.Quarto = { typesetMath };
 <span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Let's test the model! ---</span></span>
 <span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
 <span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dummy Mel-Spectrogram: Batch size 2, 1 channel, 128 Mel-bins, 160 time frames</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    dummy_audio <span class="op">=</span> torch.randn(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">160</span>) 
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    dummy_audio <span class="op">=</span> torch.randn(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">128</span>, <span class="dv">160</span>) </span>
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    model <span class="op">=</span> AudioTransformer(num_classes<span class="op">=</span><span class="dv">10</span>, num_patches<span class="op">=</span><span class="dv">80</span>)</span>
 <span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> model(dummy_audio)</span>
@@ -433,6 +335,104 @@ window.Quarto = { typesetMath };
 <span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Output shape: </span><span class="sc">{</span>output<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <hr>
 </section>
+<section id="key-milestones-how-transformers-transformed-audio-ai" class="level2">
+<h2 class="anchored" data-anchor-id="key-milestones-how-transformers-transformed-audio-ai">Key Milestones: How Transformers Transformed Audio AI</h2>
+<p>Now that we've built an Audio Transformer from scratch, it helps to look at how researchers have adapted attention mechanisms across different audio domains:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model / Paper</th>
+<th style="text-align: center;">Year</th>
+<th style="text-align: left;">Domain / Task</th>
+<th style="text-align: left;">Input Representation</th>
+<th style="text-align: left;">Key Architectural Innovation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/1809.04281">Music Transformer</a></strong> (Huang et al.)</td>
+<td style="text-align: center;">2018</td>
+<td style="text-align: left;">Symbolic Music Generation</td>
+<td style="text-align: left;">MIDI Events</td>
+<td style="text-align: left;">Relative positional self-attention for long sequences</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2006.11477">Wav2Vec 2.0</a></strong> (Baevski et al.)</td>
+<td style="text-align: center;">2020</td>
+<td style="text-align: left;">Self-Supervised Speech</td>
+<td style="text-align: left;">Raw 1D Waveform</td>
+<td style="text-align: left;">1D CNN + Transformer encoder with Gumbel-VQ contrastive loss</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2005.08100">Conformer</a></strong> (Gulati et al.)</td>
+<td style="text-align: center;">2020</td>
+<td style="text-align: left;">Speech Recognition (ASR)</td>
+<td style="text-align: left;">Mel-Spectrogram</td>
+<td style="text-align: left;">Interleaved depthwise convolutions + self-attention</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2104.01778">AST</a></strong> (Gong et al.)</td>
+<td style="text-align: center;">2021</td>
+<td style="text-align: left;">Audio Event Classification</td>
+<td style="text-align: left;">2D Mel-Spectrogram Patches</td>
+<td style="text-align: left;">Pure ViT architecture applied directly to spectrogram patches</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2106.07447">HuBERT</a></strong> (Hsu et al.)</td>
+<td style="text-align: center;">2021</td>
+<td style="text-align: left;">Self-Supervised Representation</td>
+<td style="text-align: left;">Mel / Raw Waveform</td>
+<td style="text-align: left;">Offline k-means pseudo-labeling with BERT-style masked prediction</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2010.13154">SepFormer</a></strong> (Subakan et al.)</td>
+<td style="text-align: center;">2021</td>
+<td style="text-align: left;">Source Separation</td>
+<td style="text-align: left;">Time-domain learned frames</td>
+<td style="text-align: left;">Dual-path Transformer (short-term &amp; long-term attention)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2212.04356">Whisper</a></strong> (OpenAI, Radford et al.)</td>
+<td style="text-align: center;">2022</td>
+<td style="text-align: left;">Multilingual Speech-to-Text</td>
+<td style="text-align: left;">80-channel Mel-Spectrogram</td>
+<td style="text-align: left;">Large-scale weakly supervised Encoder-Decoder Transformer</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong><a href="https://arxiv.org/abs/2306.05284">MusicGen</a></strong> &amp; <strong><a href="https://arxiv.org/abs/2301.02111">VALL-E</a></strong> (Meta / MS)</td>
+<td style="text-align: center;">2023</td>
+<td style="text-align: left;">Audio &amp; Speech Generation</td>
+<td style="text-align: left;">Discrete Codec Tokens (EnCodec)</td>
+<td style="text-align: left;">Multi-codebook delay interleaving &amp; AR+NAR cascades</td>
+</tr>
+</tbody>
+</table>
+
+<section id="classification-representation-ast-hubert" class="level3">
+<h3 class="anchored" data-anchor-id="classification-representation-ast-hubert">1. Classification &amp; Representation: AST &amp; HuBERT</h3>
+<ul>
+<li><strong><a href="https://arxiv.org/abs/2104.01778">AST (Audio Spectrogram Transformer)</a></strong>: Showed that audio classification does not require specialized 1D CNNs or RNNs. By converting a Mel-Spectrogram into a grid of 2D patches (just like Vision Transformers process images), AST established SOTA performance on benchmarks like AudioSet and ESC-50.</li>
+<li><strong><a href="https://arxiv.org/abs/2106.07447">HuBERT</a></strong> &amp; <strong><a href="https://arxiv.org/abs/2006.11477">Wav2Vec 2.0</a></strong>: Solved the lack of labeled audio data by introducing self-supervised pre-training. HuBERT uses offline k-means clustering to turn continuous acoustic frames into discrete target units, training the Transformer to predict masked tokens similar to BERT in NLP.</li>
+</ul>
+</section>
+
+<section id="speech-recognition-perception-whisper-conformer" class="level3">
+<h3 class="anchored" data-anchor-id="speech-recognition-perception-whisper-conformer">2. Speech Recognition &amp; Perception: Whisper &amp; Conformer</h3>
+<ul>
+<li><strong><a href="https://arxiv.org/abs/2005.08100">Conformer</a></strong>: Combined the local feature-extraction power of CNNs with the global context of Transformers, creating the standard architecture for modern speech-to-text engines.</li>
+<li><strong><a href="https://arxiv.org/abs/2212.04356">OpenAI Whisper</a></strong>: Demonstrated that scaling a standard Encoder-Decoder Transformer with simple Mel-Spectrogram inputs over 680,000 hours of weakly supervised web data yields human-level speech transcription and translation robustness across languages.</li>
+</ul>
+</section>
+
+<section id="generation-separation-musicgen-vall-e-sepformer" class="level3">
+<h3 class="anchored" data-anchor-id="generation-separation-musicgen-vall-e-sepformer">3. Generation &amp; Separation: MusicGen, VALL-E &amp; SepFormer</h3>
+<ul>
+<li><strong><a href="https://arxiv.org/abs/2010.13154">SepFormer</a></strong>: Applied dual-path self-attention to separate overlapping speakers or instruments in the time domain without losing phase relationship.</li>
+<li><strong><a href="https://arxiv.org/abs/2306.05284">MusicGen</a></strong> &amp; <strong><a href="https://arxiv.org/abs/2301.02111">VALL-E</a></strong>: Transformed audio generation from raw sample synthesis into discrete language modeling by quantizing audio into multi-stream neural codec tokens (EnCodec / DAC) and predicting them using delayed causal attention patterns.</li>
+</ul>
+</section>
+</section>
+<hr>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
 <p>By treating audio spectrograms as images and chopping them into patches, we can seamlessly apply the standard Transformer architecture to sound! This approach (AST) holds state-of-the-art records on benchmarks like AudioSet.</p>
